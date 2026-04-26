@@ -31,4 +31,4 @@ Obsidian is where you store your thoughts, trust documents, and business strateg
 1. Open the **Terminal**.
 2. Type: `git add .` (Packs the box).
 3. Type: `git commit -m "Update"` (Labels the box).
-4. Type: `git push` (Sends it to the vault).
+4. Type: `git push` (Sends it to the vault). 
