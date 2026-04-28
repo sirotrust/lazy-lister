@@ -1,7 +1,14 @@
 import streamlit as st
 import pandas as pd
+from google import genai
 
-# --- 1. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
+# --- 1. THE CONNECTION ENGINE (GOOGLE BRAIN) ---
+try:
+    client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+except Exception as e:
+    st.error("API Key not found in secrets.toml.")
+
+# --- 2. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 st.markdown("""
@@ -72,7 +79,7 @@ st.markdown("""
         flex: 1 !important; height: 60px !important; border-radius: 12px !important;
         display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
         text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important;
-        text-transform: uppercase !important;
+        text-transform: uppercase !important; text-align: center !important; line-height: 60px !important;
     }
     #google-red { background-color: #CC0000 !important; }
     #amz-brown { background-color: #483332 !important; }
@@ -85,7 +92,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. HEADER ---
+# --- 3. THE "BRAIN" LISTENER ---
+if 'listing_cache' not in st.session_state:
+    st.session_state.listing_cache = ""
+
+query_params = st.query_params
+if "p" in query_params:
+    target_platform = query_params["p"]
+    user_notes = st.session_state.get("notes_input", "")
+    current_style = st.session_state.get("selected_style_val", "Simple")
+    
+    if user_notes:
+        prompt = f"Write a professional {target_platform} listing. Style: {current_style}. Details: {user_notes}"
+        try:
+            response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+            st.session_state.listing_cache = response.text
+        except:
+            st.session_state.listing_cache = "Error generating listing."
+    else:
+        st.session_state.listing_cache = "Please enter notes in Step 2 first!"
+
+# --- 4. HEADER ---
 st.markdown('''
     <div class="header-wrapper">
         <div class="title-container">
@@ -114,32 +141,33 @@ with col2:
     st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True)
     st.markdown('''
         <div class="flex-grid">
-            <a href="#" class="m-btn" id="ebay-blue">EBAY</a>
-            <a href="#" class="m-btn" id="amz-brown">AMAZON</a>
-            <a href="#" class="m-btn" id="google-red">GOOGLE</a>
-            <a href="#" class="m-btn" id="posh-maroon">POSHMARK</a>
+            <a href="https://www.ebay.com" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
+            <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
+            <a href="https://www.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
+            <a href="https://poshmark.com" target="_blank" class="m-btn" id="posh-maroon">POSHMARK</a>
         </div>
     ''', unsafe_allow_html=True)
 
     st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-    selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
+    st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="selected_style_val")
     
     style_reminders = {
         "Simple": "Quick-flip mode. Optimized for short attention spans.",
         "Expert": "SEO Heavy. Focuses on tech specs and condition keywords.",
         "Pro": "Boutique Storytelling. Highlights heritage and styling potential."
     }
-    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F59E0B;">🔔 STYLE REMINDER</span><p class="tip-text">{style_reminders[selected_style]}</p></div>''', unsafe_allow_html=True)
+    selected_rem = style_reminders.get(st.session_state.selected_style_val, "")
+    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F59E0B;">🔔 STYLE REMINDER</span><p class="tip-text">{selected_rem}</p></div>''', unsafe_allow_html=True)
 
     st.markdown('''
         <div class="flex-grid">
-            <a href="#" class="m-btn" id="fb-blue">FACEBOOK</a>
-            <a href="#" class="m-btn" id="ebay-blue">EBAY</a>
-            <a href="#" class="m-btn" id="cl-purple">C-LIST</a>
-            <a href="#" class="m-btn" id="posh-maroon">POSHMARK</a>
+            <a href="/?p=Facebook" target="_self" class="m-btn" id="fb-blue">FACEBOOK</a>
+            <a href="/?p=eBay" target="_self" class="m-btn" id="ebay-blue">EBAY</a>
+            <a href="/?p=Craigslist" target="_self" class="m-btn" id="cl-purple">C-LIST</a>
+            <a href="/?p=Poshmark" target="_self" class="m-btn" id="posh-maroon">POSHMARK</a>
         </div>
     ''', unsafe_allow_html=True)
-    st.text_area("Output", placeholder="Select a platform above to craft your listing.", height=150, key="output_input", label_visibility="collapsed")
+    st.text_area("Output", value=st.session_state.listing_cache, placeholder="Select a platform above to craft your listing.", height=150, key="output_input", label_visibility="collapsed")
     st.button("📋 COPY LISTING", use_container_width=True)
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
@@ -147,12 +175,12 @@ with col2:
     st.markdown('''<div class="suggestion-box"><span class="tip-tag" style="color: #0EA5E9;">📦 PRO-TIP</span><p class="tip-text">Branded mailers increase repeat buyer rates by 15%.</p></div>''', unsafe_allow_html=True)
     st.markdown('''
         <div class="flex-grid">
-            <a href="#" class="m-btn" id="google-red">GOOGLE SHOP</a>
-            <a href="#" class="m-btn" id="amz-brown">AMAZON PRO</a>
+            <a href="https://shopping.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
+            <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
         </div>
     ''', unsafe_allow_html=True)
 
-# --- 3. INVENTORY LOG ---
+# --- 5. INVENTORY LOG ---
 st.divider()
 st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
 
@@ -173,7 +201,6 @@ st.markdown('''
     </div>
 ''', unsafe_allow_html=True)
 
-# NEW FINAL AI BUBBLE BEFORE RESET
 st.markdown('''<div class="suggestion-box"><span class="tip-tag" style="color: #0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">Resellers who export their data weekly to CSV are 40% more likely to accurately forecast tax deductions and profit margins.</p></div>''', unsafe_allow_html=True)
 
 if st.button("🗑️ RESET SESSION", use_container_width=True):
