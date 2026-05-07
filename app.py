@@ -107,7 +107,7 @@ def clear_text_callback():
     if "market_analysis" in st.session_state:
         st.session_state["market_analysis"] = ""
 
-# --- 3. ARCHITECTURAL ENGINE (CSS LOCK - NEVER TOUCH) ---
+# --- 3. ARCHITECTURAL ENGINE (CSS LOCK - REINFORCED) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 st.markdown("""
     <style>
@@ -130,12 +130,15 @@ st.markdown("""
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 3px solid #0F172A; display: inline-block; }
     
+    /* REINFORCED BUTTON DESIGN: TARGETING BY LABEL CONTENT TO PREVENT COLOR LOSS */
     .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; border: none !important; color: white !important; width: 100% !important; }
-    div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] button { background-color: #1877F2 !important; }
-    div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button { background-color: #002F6C !important; }
-    div[data-testid="column"]:nth-of-type(3) div[data-testid="stButton"] button { background-color: #502189 !important; }
-    div[data-testid="column"]:nth-of-type(4) div[data-testid="stButton"] button { background-color: #8C1B2F !important; }
     
+    /* TARGETING BUTTONS BY TEXT TO ENSURE BRAND COLORS REMAIN STATIC */
+    button[p-typed-value="FB"] { background-color: #1877F2 !important; }
+    button[p-typed-value="EBAY"] { background-color: #002F6C !important; }
+    button[p-typed-value="CL"] { background-color: #502189 !important; }
+    button[p-typed-value="POSH"] { background-color: #8C1B2F !important; }
+
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; height: 60px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;
@@ -181,11 +184,14 @@ with col2:
     st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
     st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🚀 PRO TIP</span><p class="tip-text">{get_random_tip("s4")}</p></div>''', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
+    
+    # REINFORCED BUTTONS WITH UNIQUE LABELS FOR CSS TARGETING
     p1, p2, p3, p4 = st.columns(4)
     if p1.button("FB"): st.session_state.listing_out = generate_listing("Facebook", notes_input, selected_style)
     if p2.button("EBAY"): st.session_state.listing_out = generate_listing("eBay", notes_input, selected_style)
     if p3.button("CL"): st.session_state.listing_out = generate_listing("Craigslist", notes_input, selected_style)
     if p4.button("POSH"): st.session_state.listing_out = generate_listing("Poshmark", notes_input, selected_style)
+    
     st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
     st.button("📋 COPY LISTING", use_container_width=True)
 
