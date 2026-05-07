@@ -10,7 +10,7 @@ try:
 except Exception as e:
     st.error("API Key not found. Please check your secrets.toml.")
 
-# --- 2. THE MASTER 50-TIP NEURAL LIBRARY (RESTORED) ---
+# --- 2. THE MASTER 50-TIP NEURAL LIBRARY (DESIGNATED LOCK) ---
 TIP_POOL = {
     "s1": [
         "Pro Tip: Use the rear-facing lens; it has 40% higher resolution than the selfie camera.",
@@ -89,6 +89,7 @@ def analyze_market_logic(img_file, description):
         response = client.models.generate_content(model="gemini-2.0-flash", contents=content_parts)
         return response.text
     except Exception as e:
+        if "429" in str(e): return "Quota Exhausted. Please wait 60 seconds."
         return f"Brain Error: {str(e)}"
 
 def generate_listing(platform, details, style):
@@ -100,7 +101,7 @@ def generate_listing(platform, details, style):
     except Exception as e:
         return f"Error: {str(e)}"
 
-# --- 4. THE ARCHITECTURAL ENGINE (UNIFIED HTML/CSS DESIGN) ---
+# --- 4. THE ARCHITECTURAL ENGINE (UNIFIED HTML/CSS DESIGN LOCK) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 st.markdown("""
@@ -121,7 +122,7 @@ st.markdown("""
     .tip-tag { font-weight: 950; font-size: 11px; text-transform: uppercase; display: block; }
     .tip-text { color: #1E293B !important; font-size: 14px; font-weight: 600; line-height: 1.4; }
 
-    /* UNIFIED HTML BUTTON GRID (THE SECRET SAUCE) */
+    /* UNIFIED HTML BUTTON GRID */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; 
@@ -148,11 +149,17 @@ st.markdown("""
     .google-red { background-color: #CC0000 !important; }
     .amz-brown { background-color: #483332 !important; }
 
+    /* NATIVE BUTTON OVERRIDES (STEP 3 BRAIN & STEP 2 CLEAR) */
+    .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; color: white !important; width: 100% !important; border: none !important; }
+    
+    /* BRAIN RED LOCK (Step 3 Analyze Button) */
+    .stButton > button[kind="primary"] { background-color: #CC0000 !important; }
+    
+    /* CLEAR/UTILITY LOCK (Black) */
+    .stButton > button[kind="secondary"] { background-color: #0F172A !important; }
+
     /* TEXT AREA */
     [data-testid="stTextArea"] textarea { background-color: #F1F5F9 !important; color: #000000 !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important; }
-    
-    /* HIDE NATIVE STREAMLIT BUTTONS FOR STEPS 2, 3, 4 OUTPUT */
-    .stButton > button { border-radius: 12px !important; background-color: #0F172A !important; color: white !important; height: 60px !important; font-weight: 950 !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -169,17 +176,19 @@ with col1:
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">📝 PRO TIP</span><p class="tip-text">{get_random_tip("s2")}</p></div>', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
-    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True):
+    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, type="secondary"):
         st.session_state.notes_input = ""; st.rerun()
 
 with col2:
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">💰 PRO TIP</span><p class="tip-text">{get_random_tip("s3")}</p></div>', unsafe_allow_html=True)
-    if st.button("🚀 ANALYZE MARKET", use_container_width=True):
+    
+    # ANALYZE MARKET RED LOCK
+    if st.button("🚀 ANALYZE MARKET", use_container_width=True, type="primary"):
         st.session_state.market_analysis = analyze_market_logic(img_file, notes_input)
     if st.session_state.get("market_analysis"): st.info(st.session_state.market_analysis)
 
-    # STEP 3 GRID (PURE HTML)
+    # STEP 3 GRID (HTML)
     st.markdown(f'''<div class="flex-grid">
         <a href="https://www.ebay.com/sch/i.html?_nkw={notes_input}" target="_blank" class="m-btn ebay-blue">EBAY</a>
         <a href="https://www.amazon.com/s?k={notes_input}" target="_blank" class="m-btn amz-brown">AMAZON</a>
@@ -191,7 +200,7 @@ with col2:
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🚀 PRO TIP</span><p class="tip-text">{get_random_tip("s4")}</p></div>', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
-    # STEP 4 GRID (PURE HTML/CSS DESIGN LOCK)
+    # STEP 4 GRID (HTML/CSS DESIGN LOCK)
     st.markdown(f'''<div class="flex-grid">
         <a href="/?platform=Facebook" target="_self" class="m-btn fb-blue">FB</a>
         <a href="/?platform=eBay" target="_self" class="m-btn ebay-blue">EBAY</a>
@@ -206,16 +215,16 @@ with col2:
         st.query_params.clear()
 
     st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
-    st.button("📋 COPY LISTING", use_container_width=True)
+    st.button("📋 COPY LISTING", use_container_width=True, type="secondary")
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>', unsafe_allow_html=True)
     
-    # STEP 5 GRID (PURE HTML)
+    # STEP 5 GRID (HTML)
     st.markdown('''<div class="flex-grid">
         <a href="YOUR_LINK" target="_blank" class="m-btn google-red">GOOGLE SHOP</a>
         <a href="YOUR_LINK" target="_blank" class="m-btn amz-brown">AMAZON PRO</a>
     </div>''', unsafe_allow_html=True)
 
-if st.button("🗑️ RESET SESSION", use_container_width=True):
+if st.button("🗑️ RESET SESSION", use_container_width=True, type="secondary"):
     st.session_state.clear(); st.rerun()
