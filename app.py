@@ -61,16 +61,16 @@ TIP_POOL = {
         "Pro Tip: Send 'Offers to Likers' within 10 mins to double conversion."
     ],
     "s5": [
-        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months. [View Setup]",
-        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale. [Secure Yours]",
-        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit. [See My Set]",
-        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers. [Get Bulk Deal]",
-        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons. [Check Current Price]",
-        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.' [View Top-Rated Form]",
-        "Precision Tool: Accurate measurements are mandatory for SEO. Grab the retractable tape I use. [See My Pick]",
-        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing. [Stock Up Now]",
-        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable. [Explore Bins]",
-        "Pro-Level Finish: Thermal 4x6 labels give every package a professional look. [Shop Label Deals]"
+        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months.",
+        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale.",
+        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit.",
+        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers.",
+        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons.",
+        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.'",
+        "Precision Tool: Accurate measurements are mandatory for SEO. Grab the retractable tape I use.",
+        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing.",
+        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable.",
+        "Pro-Level Finish: Thermal 4x6 labels give every package a professional look."
     ]
 }
 
@@ -125,20 +125,8 @@ st.markdown("""
     /* UNIFIED HTML BUTTON GRID */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
-        flex: 1 !important; 
-        height: 60px !important; 
-        border-radius: 12px !important; 
-        display: flex !important; 
-        align-items: center !important; 
-        justify-content: center !important;
-        text-decoration: none !important; 
-        color: white !important; 
-        font-weight: 950 !important; 
-        font-size: 12px !important; 
-        text-transform: uppercase !important; 
-        line-height: 60px !important;
-        border: none !important;
-        cursor: pointer !important;
+        flex: 1 !important; height: 60px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+        text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important; text-transform: uppercase !important; line-height: 60px !important; border: none !important;
     }
 
     /* COLOR PALETTE */
@@ -149,14 +137,20 @@ st.markdown("""
     .google-red { background-color: #CC0000 !important; }
     .amz-brown { background-color: #483332 !important; }
 
-    /* NATIVE BUTTON OVERRIDES (STEP 3 BRAIN & STEP 2 CLEAR) */
+    /* NATIVE BUTTON OVERRIDES (DESIGN DIFFERENTIATION) */
     .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; color: white !important; width: 100% !important; border: none !important; }
     
-    /* BRAIN RED LOCK (Step 3 Analyze Button) */
+    /* ANALYZE MARKET: RED LOCK */
     .stButton > button[kind="primary"] { background-color: #CC0000 !important; }
     
-    /* CLEAR/UTILITY LOCK (Black) */
-    .stButton > button[kind="secondary"] { background-color: #0F172A !important; }
+    /* CLEAR DESCRIPTION: ORANGE UTILITY */
+    div.stButton > button[key="clear_btn"] { background-color: #EA580C !important; }
+    
+    /* COPY LISTING: TEAL SUCCESS */
+    div.stButton > button[key="copy_btn"] { background-color: #0D9488 !important; }
+    
+    /* RESET SESSION: DARK MAROON */
+    div.stButton > button[key="reset_btn"] { background-color: #7F1D1D !important; }
 
     /* TEXT AREA */
     [data-testid="stTextArea"] textarea { background-color: #F1F5F9 !important; color: #000000 !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important; }
@@ -176,19 +170,16 @@ with col1:
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">📝 PRO TIP</span><p class="tip-text">{get_random_tip("s2")}</p></div>', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
-    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, type="secondary"):
+    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, key="clear_btn"):
         st.session_state.notes_input = ""; st.rerun()
 
 with col2:
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">💰 PRO TIP</span><p class="tip-text">{get_random_tip("s3")}</p></div>', unsafe_allow_html=True)
-    
-    # ANALYZE MARKET RED LOCK
     if st.button("🚀 ANALYZE MARKET", use_container_width=True, type="primary"):
         st.session_state.market_analysis = analyze_market_logic(img_file, notes_input)
     if st.session_state.get("market_analysis"): st.info(st.session_state.market_analysis)
 
-    # STEP 3 GRID (HTML)
     st.markdown(f'''<div class="flex-grid">
         <a href="https://www.ebay.com/sch/i.html?_nkw={notes_input}" target="_blank" class="m-btn ebay-blue">EBAY</a>
         <a href="https://www.amazon.com/s?k={notes_input}" target="_blank" class="m-btn amz-brown">AMAZON</a>
@@ -200,7 +191,6 @@ with col2:
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🚀 PRO TIP</span><p class="tip-text">{get_random_tip("s4")}</p></div>', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
-    # STEP 4 GRID (HTML/CSS DESIGN LOCK)
     st.markdown(f'''<div class="flex-grid">
         <a href="/?platform=Facebook" target="_self" class="m-btn fb-blue">FB</a>
         <a href="/?platform=eBay" target="_self" class="m-btn ebay-blue">EBAY</a>
@@ -208,23 +198,20 @@ with col2:
         <a href="/?platform=Poshmark" target="_self" class="m-btn posh-maroon">POSH</a>
     </div>''', unsafe_allow_html=True)
 
-    # Catch the HTML click
     params = st.query_params
     if "platform" in params:
         st.session_state.listing_out = generate_listing(params["platform"], notes_input, selected_style)
         st.query_params.clear()
 
     st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
-    st.button("📋 COPY LISTING", use_container_width=True, type="secondary")
+    st.button("📋 COPY LISTING", use_container_width=True, key="copy_btn")
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>', unsafe_allow_html=True)
-    
-    # STEP 5 GRID (HTML)
     st.markdown('''<div class="flex-grid">
         <a href="YOUR_LINK" target="_blank" class="m-btn google-red">GOOGLE SHOP</a>
         <a href="YOUR_LINK" target="_blank" class="m-btn amz-brown">AMAZON PRO</a>
     </div>''', unsafe_allow_html=True)
 
-if st.button("🗑️ RESET SESSION", use_container_width=True, type="secondary"):
+if st.button("🗑️ RESET SESSION", use_container_width=True, key="reset_btn"):
     st.session_state.clear(); st.rerun()
