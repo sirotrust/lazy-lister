@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from google import genai
-from PIL import Image
+from google.genai import types
 import time
 
 # --- 1. THE CONNECTION ENGINE (THE BRAIN) ---
@@ -12,40 +12,45 @@ except Exception as e:
 
 # --- 2. NEURAL LOGIC FUNCTIONS ---
 
-def get_brain_advice(step_name, context):
-    """Pulls live AI Strategies from Gemini. Forced refresh every 15 seconds."""
+def get_brain_advice(step_id, step_name, context):
+    """Pulls unique, live AI Strategies for every step."""
     try:
         current_time = time.time()
-        cache_key = f"advice_{step_name}"
-        # If no advice or it's older than 15s, fetch new
-        if cache_key not in st.session_state or (current_time - st.session_state.get(f"{cache_key}_time", 0) > 15):
-            prompt = f"Give one ultra-concise professional reseller tip for {step_name}. Context: {context}. Max 10 words."
+        cache_key = f"advice_{step_id}"
+        if cache_key not in st.session_state or (current_time - st.session_state.get(f"{cache_key}_time", 0) > 20):
+            prompt = f"Give a professional reseller tip for {step_name}. Context: {context}. Use real-world data. Max 12 words."
             response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
             st.session_state[cache_key] = response.text
             st.session_state[f"{cache_key}_time"] = current_time
         return st.session_state[cache_key]
     except:
-        return "Synchronizing market intelligence..."
+        return "Syncing market data..."
 
 def analyze_market_logic(img_file, description):
-    """Encodes image correctly to fix mime_type error and analyzes fallback data."""
+    """
+    FALLBACK UTILITY: 
+    Analyzes photo for brand/item. If grainy, falls back to text description.
+    Then generates specific comparative search keywords for Step 3 platforms.
+    """
     if not img_file and not description:
         return "Need a photo or description to analyze the market!"
     
     try:
-        prompt_text = f"Market Analysis Request. Description: {description}. Task: Provide resale value, demand, and top keywords. If photo is unclear, prioritize description."
-        
+        content_parts = []
         if img_file:
-            # Correctly format image for Google GenAI
-            raw_bytes = img_file.getvalue()
-            img_part = {"mime_type": img_file.type, "data": raw_bytes}
-            response = client.models.generate_content(
-                model="gemini-2.0-flash", 
-                contents=[img_part, prompt_text]
-            )
-        else:
-            response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt_text)
+            content_parts.append(types.Part.from_bytes(data=img_file.getvalue(), mime_type=img_file.type))
+        
+        # This prompt forces the "Comparative Logic" you had in the OpenRouter version
+        comparison_prompt = f"""
+        ACT AS AN EXPERT RESELLER. 
+        1. Analyze this image. If it is blurry/grainy, use these notes: '{description}'.
+        2. Identify the exact item, brand, and model.
+        3. Determine the 3 best 'Search Strings' that will yield the most accurate 'Sold/Completed' price comparisons on eBay, Amazon, and Poshmark.
+        4. Provide a brief Market Valuation (Low/Mid/High).
+        """
+        content_parts.append(types.Part.from_text(text=comparison_prompt))
             
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=content_parts)
         return response.text
     except Exception as e:
         return f"Brain Error: {str(e)}"
@@ -53,7 +58,8 @@ def analyze_market_logic(img_file, description):
 def clear_text_callback():
     st.session_state["notes_input"] = ""
     st.session_state["listing_out"] = ""
-    st.session_state["market_analysis"] = ""
+    if "market_analysis" in st.session_state:
+        st.session_state["market_analysis"] = ""
 
 # --- 3. ARCHITECTURAL ENGINE (CSS LOCK) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
@@ -112,40 +118,36 @@ st.markdown(f'''<div class="header-wrapper"><span class="brand-word">LAZY 🦥 L
 col1, col2 = st.columns(2, gap="large")
 
 with col1:
-    # STEP 1
     st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Image Scan", "Image quality and lighting")}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s1", "Visual Recon", "Identifying brands from grainy tags")}</p></div>''', unsafe_allow_html=True)
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     
-    # STEP 2
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Logging", "Detailed sensory description")}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s2", "Contextual Data", "Fallback keywords for blurry photos")}</p></div>''', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
     st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, on_click=clear_text_callback)
 
 with col2:
-    # STEP 3
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Valuation", "Market pricing data")}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s3", "Market Pulse", "Sold-listing velocity vs listed price")}</p></div>''', unsafe_allow_html=True)
     
     if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
-        with st.spinner("Decoding visuals..."):
+        with st.spinner("Synthesizing Multimodal Data..."):
             st.session_state.market_analysis = analyze_market_logic(img_file, notes_input)
-            st.toast("Brain analysis complete.", icon="✅")
+            st.toast("Comparative Analysis Ready.", icon="✅")
 
     if st.session_state.get("market_analysis"):
         st.info(st.session_state.market_analysis)
 
     st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
-        <a href="https://www.ebay.com" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
-        <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
-        <a href="https://www.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
-        <a href="https://poshmark.com" target="_blank" class="m-btn" id="posh-maroon">POSHMARK</a>
+        <a href="https://www.ebay.com/sch/i.html?_nkw={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
+        <a href="https://www.amazon.com/s?k={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
+        <a href="https://www.google.com/search?q={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
+        <a href="https://poshmark.com/search?query={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="posh-maroon">POSHMARK</a>
     </div>''', unsafe_allow_html=True)
 
-    # STEP 4
     st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Listing", "SEO copy generation")}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s4", "SEO Logic", "Algorithm-specific title construction")}</p></div>''', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
     p1, p2, p3, p4 = st.columns(4)
@@ -153,17 +155,12 @@ with col2:
         pass
     if p2.button("EBAY"):
         pass
-    if p3.button("CL"):
-        pass
-    if p4.button("POSH"):
-        pass
 
     st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
     st.button("📋 COPY LISTING", use_container_width=True)
 
-    # STEP 5
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Supplies", "Packaging and costs")}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s5", "Cost Control", "Minimizing overhead via bulk sourcing")}</p></div>''', unsafe_allow_html=True)
     st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
         <a href="https://shopping.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
         <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
@@ -172,7 +169,7 @@ with col2:
 # INVENTORY
 st.divider()
 st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Automation", "Data and scaling")}</p></div>''', unsafe_allow_html=True)
+st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("s6", "Scaling", "Tax-ready data and annual forecasting")}</p></div>''', unsafe_allow_html=True)
 st.table(pd.DataFrame({"Item": ["Scanning..."], "Platform": ["Syncing"], "Price": ["--"]}))
 
 if st.button("🗑️ RESET SESSION", use_container_width=True):
