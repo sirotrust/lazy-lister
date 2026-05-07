@@ -143,8 +143,11 @@ with col1:
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown('<span class="step-instruction">Describe vibe, texture, and silhouette.</span>', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
+    
+    # FIXED CLEAR LOGIC
     if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True):
         st.session_state.notes_input = ""
+        st.session_state.listing_out = ""
         st.rerun()
 
 with col2:
