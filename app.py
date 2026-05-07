@@ -11,73 +11,73 @@ try:
 except Exception as e:
     st.error("API Key not found. Check secrets.toml.")
 
-# --- 2. THE MASTER 50-TIP PRO LIBRARY (DATA-DRIVEN) ---
+# --- 2. THE MASTER 50-TIP PRO LIBRARY (PERSONALIZED & DATA-DRIVEN) ---
 TIP_POOL = {
     "s1": [
         "Pro Tip: Clean your lens with a microfiber cloth before every shoot.",
         "Pro Tip: Shoot at a 45-degree 'hero' angle to show depth and scale.",
-        "Pro Tip: Use the 'Portrait Mode' on modern phones to blur busy backgrounds.",
+        "Pro Tip: Modern 'Portrait Mode' helps blur busy backgrounds for focus.",
         "Pro Tip: Always photograph the care tag; buyers search for fabric content.",
-        "Pro Tip: Use a white foam board as a reflector to bounce light into shadows.",
+        "Pro Tip: A white foam board reflector helps bounce light into shadows.",
         "Pro Tip: Capture 'Scale' by placing a coin or ruler next to small items.",
-        "Pro Tip: Shoot 'Flat Lays' from directly above to avoid perspective distortion.",
-        "Pro Tip: Use a lint roller on every fabric item before the first shutter click.",
-        "Pro Tip: Turn off overhead yellow lights; stick to pure natural window light.",
-        "Pro Tip: Highlight 'Imperfections' with a pointer to build immediate trust."
+        "Pro Tip: Direct overhead 'Flat Lays' avoid perspective distortion.",
+        "Pro Tip: Use a lint roller on fabrics before the first shutter click.",
+        "Pro Tip: Stick to pure natural window light; avoid yellow bulbs.",
+        "Pro Tip: Highlight 'Imperfections' with a pointer to build buyer trust."
     ],
     "s2": [
         "Pro Tip: Front-load your title with Brand + Model + Size for SEO.",
-        "Pro Tip: Use 'NWT' (New With Tags) or 'EUC' (Excellent Used Condition) in titles.",
+        "Pro Tip: Use 'NWT' or 'EUC' in titles for rapid condition scanning.",
         "Pro Tip: List three specific measurements: Pit-to-pit, length, and sleeve.",
         "Pro Tip: Use 'texture' keywords like 'slubby,' 'pebbled,' or 'brushed'.",
         "Pro Tip: Mention if an item comes from a 'Smoke-Free' or 'Pet-Free' home.",
-        "Pro Tip: Add a 'Style Note' on how to wear the item to inspire the buyer.",
+        "Pro Tip: Add a 'Style Note' on how to wear the item to inspire buyers.",
         "Pro Tip: Define the 'Vibe': Is it Gorpcore, Dark Academia, or Streetwear?.",
-        "Pro Tip: Use the 'Model Code' from the tag to find professional stock info.",
+        "Pro Tip: Use the 'Model Code' from the tag to find pro stock info.",
         "Pro Tip: Be specific about color; use 'Cobalt' instead of just 'Blue'.",
         "Pro Tip: Mention 'Stitch Detail' or 'Quality Hardware' for luxury items."
     ],
     "s3": [
-        "Pro Tip: Check 'Sold' listings, then price 10% higher for negotiation room.",
-        "Pro Tip: Items listed at $24.99 sell 15% faster than those at $25.00.",
-        "Pro Tip: Use 'Promoted Listings' at 2% to jump to the top of eBay search.",
-        "Pro Tip: Calculate shipping *before* you price; heavy coats eat margins.",
-        "Pro Tip: Cross-reference 'Poshmark' vs 'eBay' prices for a true market average.",
-        "Pro Tip: Items with 'Free Shipping' tags get 2x more visibility in filters.",
-        "Pro Tip: Price vintage items based on decade and rarity, not just condition.",
-        "Pro Tip: Drop prices by 10% on Fridays when buyers receive their paychecks.",
-        "Pro Tip: High-demand brands (Nike, Lululemon) follow strict MSRP-logic.",
-        "Pro Tip: Don't chase the bottom; if your photos are better, price higher."
+        "Pro Tip: Check 'Sold' listings, then price 10% higher for negotiation.",
+        "Pro Tip: Items at $24.99 sell 15% faster than those at $25.00.",
+        "Pro Tip: Use 'Promoted Listings' at 2% to jump to the top of eBay.",
+        "Pro Tip: Calculate shipping *before* pricing; heavy coats eat margins.",
+        "Pro Tip: Cross-reference 'Poshmark' vs 'eBay' for a market average.",
+        "Pro Tip: 'Free Shipping' tags get 2x more visibility in user filters.",
+        "Pro Tip: Price vintage on decade and rarity, not just condition.",
+        "Pro Tip: Drop prices by 10% on Fridays when buyers receive paychecks.",
+        "Pro Tip: High-demand brands (Nike, Lululemon) follow MSRP-logic.",
+        "Pro Tip: Better photos allow you to price higher than the competition."
     ],
     "s4": [
-        "Pro Tip: Relist items every 30 days to keep 'New Listing' algorithm status.",
+        "Pro Tip: Relist items every 30 days to keep 'New Listing' status.",
         "Pro Tip: Use all 80 characters in eBay; the algorithm hates empty space.",
-        "Pro Tip: Share your Poshmark closet at 9PM EST for peak buyer activity.",
-        "Pro Tip: Include 'Gifts for Him/Her' during holiday seasons for SEO.",
+        "Pro Tip: Share your Poshmark closet at 9PM EST for peak activity.",
+        "Pro Tip: Include 'Gifts for Him/Her' during holidays for seasonal SEO.",
         "Pro Tip: Never use stock photos alone; platforms de-prioritize them.",
-        "Pro Tip: Copy-paste your top tags into the bottom of the description.",
-        "Pro Tip: Offer 'Combined Shipping' to encourage multi-item purchases.",
-        "Pro Tip: Use 'Expert' style for high-end tech to show technical knowledge.",
-        "Pro Tip: On Facebook, respond within 5 mins to keep your 'Responsive' badge.",
-        "Pro Tip: Use 'Simple' style for fast-moving trendy items like mall brands."
+        "Pro Tip: Copy-paste your top tags into the description footer.",
+        "Pro Tip: 'Combined Shipping' offers encourage multi-item purchases.",
+        "Pro Tip: Use 'Expert' style for high-end tech to show knowledge.",
+        "Pro Tip: Respond within 5 mins on Facebook to keep your 'Badge'.",
+        "Pro Tip: Use 'Simple' style for fast-moving trendy mall brands."
     ],
     "s5": [
-        "Affiliate Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months. [View Deal].",
-        "Affiliate Suggestion: Precision scales prevent $5 USPS 'Underweight' surcharges. [Get My Scale].",
-        "Affiliate Suggestion: Professional Softboxes kill 'Yellow Tint' in photos instantly. [See My Set].",
-        "Affiliate Suggestion: These Matte-Black Polymailers win repeat boutique buyers. [Shop Bulk].",
-        "Affiliate Suggestion: Items on a Mannequin sell 20% faster than flat-lays. [Check Current Price].",
-        "Affiliate Suggestion: Retractable Fabric Measures are mandatory for SEO listing. [Get One Here].",
-        "Affiliate Suggestion: Bulk 6-pack Shipping Tape saves $12 over single rolls. [Stock Up Now].",
-        "Affiliate Suggestion: Clear Bin Storage keeps inventory dust-free and searchable. [Shop Bins].",
-        "Affiliate Suggestion: Use a Dymo for high-volume 4x6 label professional looks. [See Deals].",
-        "Affiliate Suggestion: Ring Lights provide consistent 'Eyes' reflection for jewelry. [Shop Top Picks]."
+        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months. [View Setup].",
+        "Essential Sourcing: Precision scales prevent $5 USPS 'Underweight' surcharges. [Get My Scale].",
+        "Curated for You: Professional Softboxes kill 'Yellow Tint' in photos instantly. [See My Set].",
+        "Expert Pickup: These Matte-Black Polymailers win repeat boutique buyers. [Shop Bulk].",
+        "Recommended Asset: Items on a Mannequin sell 20% faster than flat-lays. [Current Price].",
+        "Pro Tool: Retractable Fabric Measures are mandatory for SEO listing. [Grab the One I Use].",
+        "Sourcing Secret: Bulk 6-pack Shipping Tape saves $12 over single rolls. [Stock Up Now].",
+        "Growth Strategy: Clear Bin Storage keeps inventory dust-free and searchable. [View Bins].",
+        "Pro Recommendation: Use a Dymo for high-volume 4x6 label professional looks. [See Deals].",
+        "The Reseller's Choice: Ring Lights provide consistent reflection for jewelry. [Top Picks]."
     ]
 }
 
 def get_random_tip(step_id):
     """Pulls zero-quota advice from the local pool."""
-    return random.choice(TIP_POOL.get(step_id, ["Analyzing market trends..."]))
+    return random.choice(TIP_POOL.get(step_id, ["Synchronizing market intelligence..."]))
 
 def analyze_market_logic(img_file, description):
     """Comparative Engine: Photo first, Text fallback."""
@@ -190,10 +190,11 @@ with col2:
     st.button("📋 COPY LISTING", use_container_width=True)
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">📦 AFFILIATE DEALS</span><p class="tip-text">{get_random_tip("s5")}</p></div>''', unsafe_allow_html=True)
+    # PERSONALIZED wording for psychology
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>''', unsafe_allow_html=True)
     st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
-        <a href="YOUR_GOOGLE_AFFILIATE_LINK" target="_blank" class="m-btn" id="google-red">SHOP</a>
-        <a href="YOUR_AMAZON_AFFILIATE_LINK" target="_blank" class="m-btn" id="amz-brown">PRO</a>
+        <a href="YOUR_GOOGLE_SHOPPING_LINK" target="_blank" class="m-btn" id="google-red">SHOP MY PICKS</a>
+        <a href="YOUR_AMAZON_PRO_LINK" target="_blank" class="m-btn" id="amz-brown">PRO GEAR</a>
     </div>''', unsafe_allow_html=True)
 
 if st.button("🗑️ RESET SESSION", use_container_width=True):
