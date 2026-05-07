@@ -62,16 +62,16 @@ TIP_POOL = {
         "Pro Tip: Use 'Simple' style for fast-moving trendy mall brands."
     ],
     "s5": [
-        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months. [View Setup].",
-        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale. [Secure Yours].",
-        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit. [See My Set].",
-        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers. [Get Bulk Deal].",
-        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons. [Check Current Price].",
-        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.' [View Top-Rated Form].",
-        "Precision Tool: Accurate measurements are mandatory for SEO. Grab the retractable tape I use. [See My Pick].",
-        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing. [Stock Up Now].",
-        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable. [Explore Bins].",
-        "Pro-Level Finish: Thermal 4x6 labels give every package a 'corporate' professional look. [Shop Label Deals]."
+        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months..",
+        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale..",
+        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit..",
+        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers..",
+        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons..",
+        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.'.",
+        "Precision Tool: Accurate measurements are mandatory for SEO. Retractable tape is a must-have..",
+        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing..",
+        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable..",
+        "Pro-Level Finish: Thermal 4x6 labels give every package a 'corporate' professional look.."
     ]
 }
 
@@ -107,7 +107,7 @@ def clear_text_callback():
     if "market_analysis" in st.session_state:
         st.session_state["market_analysis"] = ""
 
-# --- 3. ARCHITECTURAL ENGINE (CSS LOCK) ---
+# --- 3. ARCHITECTURAL ENGINE (CSS LOCK - NEVER TOUCH) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 st.markdown("""
     <style>
@@ -126,6 +126,7 @@ st.markdown("""
     .tip-text { color: #1E293B !important; font-size: 14px; font-weight: 600; line-height: 1.4; }
     .header-wrapper { margin-top: 30px; margin-bottom: 40px; }
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
+    .sloth-anchor { font-size: 55px; margin-top: -25px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 3px solid #0F172A; display: inline-block; }
     
@@ -135,6 +136,7 @@ st.markdown("""
     div[data-testid="column"]:nth-of-type(3) div[data-testid="stButton"] button { background-color: #502189 !important; }
     div[data-testid="column"]:nth-of-type(4) div[data-testid="stButton"] button { background-color: #8C1B2F !important; }
     
+    .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; height: 60px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;
         text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important; text-transform: uppercase !important; text-align: center !important; line-height: 60px !important;
@@ -169,7 +171,7 @@ with col2:
     if st.session_state.get("market_analysis"):
         st.info(st.session_state.market_analysis)
 
-    st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
+    st.markdown(f'''<div class="flex-grid">
         <a href="https://www.ebay.com/sch/i.html?_nkw={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
         <a href="https://www.amazon.com/s?k={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
         <a href="https://www.google.com/search?q={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
@@ -189,9 +191,9 @@ with col2:
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
     st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>''', unsafe_allow_html=True)
-    st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
-        <a href="YOUR_GOOGLE_SHOPPING_LINK" target="_blank" class="m-btn" id="google-red">SHOP MY PICKS</a>
-        <a href="YOUR_AMAZON_PRO_LINK" target="_blank" class="m-btn" id="amz-brown">PRO GEAR</a>
+    st.markdown('''<div class="flex-grid">
+        <a href="YOUR_GOOGLE_SHOPPING_LINK" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
+        <a href="YOUR_AMAZON_PRO_LINK" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
     </div>''', unsafe_allow_html=True)
 
 if st.button("🗑️ RESET SESSION", use_container_width=True):
