@@ -11,7 +11,7 @@ try:
 except Exception as e:
     st.error("API Key not found. Check secrets.toml.")
 
-# --- 2. THE MASTER 50-TIP PRO LIBRARY (PERSONALIZED & DATA-DRIVEN) ---
+# --- 2. THE MASTER 50-TIP PRO LIBRARY ---
 TIP_POOL = {
     "s1": [
         "Pro Tip: Clean your lens with a microfiber cloth before every shoot.",
@@ -63,24 +63,22 @@ TIP_POOL = {
     ],
     "s5": [
         "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months. [View Setup].",
-        "Essential Sourcing: Precision scales prevent $5 USPS 'Underweight' surcharges. [Get My Scale].",
-        "Curated for You: Professional Softboxes kill 'Yellow Tint' in photos instantly. [See My Set].",
-        "Expert Pickup: These Matte-Black Polymailers win repeat boutique buyers. [Shop Bulk].",
-        "Recommended Asset: Items on a Mannequin sell 20% faster than flat-lays. [Current Price].",
-        "Pro Tool: Retractable Fabric Measures are mandatory for SEO listing. [Grab the One I Use].",
-        "Sourcing Secret: Bulk 6-pack Shipping Tape saves $12 over single rolls. [Stock Up Now].",
-        "Growth Strategy: Clear Bin Storage keeps inventory dust-free and searchable. [View Bins].",
-        "Pro Recommendation: Use a Dymo for high-volume 4x6 label professional looks. [See Deals].",
-        "The Reseller's Choice: Ring Lights provide consistent reflection for jewelry. [Top Picks]."
+        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale. [Secure Yours].",
+        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit. [See My Set].",
+        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers. [Get Bulk Deal].",
+        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons. [Check Current Price].",
+        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.' [View Top-Rated Form].",
+        "Precision Tool: Accurate measurements are mandatory for SEO. Grab the retractable tape I use. [See My Pick].",
+        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing. [Stock Up Now].",
+        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable. [Explore Bins].",
+        "Pro-Level Finish: Thermal 4x6 labels give every package a 'corporate' professional look. [Shop Label Deals]."
     ]
 }
 
 def get_random_tip(step_id):
-    """Pulls zero-quota advice from the local pool."""
     return random.choice(TIP_POOL.get(step_id, ["Synchronizing market intelligence..."]))
 
 def analyze_market_logic(img_file, description):
-    """Comparative Engine: Photo first, Text fallback."""
     if not img_file and not description:
         return "Need a photo or description!"
     try:
@@ -190,7 +188,6 @@ with col2:
     st.button("📋 COPY LISTING", use_container_width=True)
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-    # PERSONALIZED wording for psychology
     st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>''', unsafe_allow_html=True)
     st.markdown(f'''<div style="display:flex; gap:8px; margin:8px 0;">
         <a href="YOUR_GOOGLE_SHOPPING_LINK" target="_blank" class="m-btn" id="google-red">SHOP MY PICKS</a>
