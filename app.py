@@ -3,7 +3,6 @@ import pandas as pd
 from google import genai
 
 # --- 1. THE CONNECTION ENGINE (THE BRAIN) ---
-# This connects the app to the Google Gemini engine.
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 except Exception as e:
@@ -23,14 +22,11 @@ def generate_listing(platform, details, style):
 # --- 2. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
-# This block ensures your design remains 100% untouched while forcing colors onto Step 4.
 st.markdown("""
     <style>
-    /* GLOBAL OVERRIDES */
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
 
-    /* ZONE 1: RADIO & LABEL VISIBILITY */
     [data-testid="stRadio"] label, 
     [data-testid="stRadio"] label p,
     [data-testid="stWidgetLabel"] p {
@@ -39,7 +35,6 @@ st.markdown("""
         opacity: 1 !important;
     }
 
-    /* ZONE 2: TABLE CONTRAST */
     [data-testid="stTable"] td, 
     [data-testid="stTable"] th {
         color: #0F172A !important;
@@ -48,7 +43,6 @@ st.markdown("""
         border: 1px solid #E2E8F0 !important;
     }
 
-    /* ZONE 3: TEXT INPUTS */
     [data-testid="stTextArea"] textarea {
         background-color: #F1F5F9 !important;
         color: #0F172A !important; 
@@ -62,7 +56,6 @@ st.markdown("""
         color: #64748B !important;
     }
 
-    /* ZONE 4: NOTIFICATION BOXES */
     .reminder-box { 
         background-color: #FFFBEB !important; 
         border-left: 6px solid #F59E0B !important; 
@@ -76,7 +69,6 @@ st.markdown("""
     .tip-tag { font-weight: 900; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
     .tip-text { color: #1E293B !important; font-size: 14px; font-weight: 600; line-height: 1.4; }
 
-    /* ZONE 5: HEADER & NEON */
     .header-wrapper { margin-top: 30px; margin-bottom: 40px; }
     .title-container { display: flex; align-items: center; gap: 12px; }
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; margin: 0; letter-spacing: -1px; }
@@ -87,7 +79,6 @@ st.markdown("""
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 3px solid #0F172A; display: inline-block; }
     .step-instruction { color: #64748B; font-size: 14px; font-weight: 700; margin-top: 5px; margin-bottom: 10px; display: block; }
 
-    /* ZONE 6: BUTTON UNIFORMITY & COLORS */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; height: 60px !important; border-radius: 12px !important;
@@ -105,18 +96,13 @@ st.markdown("""
     #copy-teal { background-color: #0D9488 !important; }
     #dl-indigo { background-color: #4338CA !important; }
 
-    /* STEP 4: BRUTE FORCE CSS TO MAINTAIN DESIGN ON ACTIVE BUTTONS */
     .stButton > button {
         border-radius: 12px !important; height: 60px !important; font-weight: 950 !important;
         text-transform: uppercase !important; border: none !important; color: white !important; width: 100% !important;
     }
-    /* FB Blue - Col 1 */
     div[data-testid="column"]:nth-of-type(1) div[data-testid="stButton"] button { background-color: #1877F2 !important; }
-    /* eBay Blue - Col 2 */
     div[data-testid="column"]:nth-of-type(2) div[data-testid="stButton"] button { background-color: #002F6C !important; }
-    /* CL Purple - Col 3 */
     div[data-testid="column"]:nth-of-type(3) div[data-testid="stButton"] button { background-color: #502189 !important; }
-    /* Posh Maroon - Col 4 */
     div[data-testid="column"]:nth-of-type(4) div[data-testid="stButton"] button { background-color: #8C1B2F !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -142,12 +128,15 @@ with col1:
     
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown('<span class="step-instruction">Describe vibe, texture, and silhouette.</span>', unsafe_allow_html=True)
+    
+    # Use session state to handle text area values safely
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
     
-    # FIXED CLEAR LOGIC
     if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True):
-        st.session_state.notes_input = ""
-        st.session_state.listing_out = ""
+        # The designed-safe way to clear widgets with keys
+        st.session_state["notes_input"] = ""
+        if "listing_out" in st.session_state:
+            st.session_state["listing_out"] = ""
         st.rerun()
 
 with col2:
@@ -170,7 +159,6 @@ with col2:
     style_reminders = {"Simple": "Quick-flip mode.", "Expert": "SEO Heavy.", "Pro": "Boutique Storytelling."}
     st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F59E0B;">🔔 STYLE REMINDER</span><p class="tip-text">{style_reminders[selected_style]}</p></div>''', unsafe_allow_html=True)
 
-    # --- THE BRAIN GRID (STEP 4) ---
     p1, p2, p3, p4 = st.columns(4)
     if p1.button("FACEBOOK"):
         st.session_state.listing_out = generate_listing("Facebook Marketplace", notes_input, selected_style)
