@@ -5,8 +5,9 @@ from google.genai import types
 import pandas as pd
 import random
 from datetime import datetime
+from PIL import Image
 
-# --- 1. THE BRAIN & INVENTORY STATE ---
+# --- 1. THE BRAIN & INVENTORY ANCHOR ---
 if 'inventory_log' not in st.session_state:
     st.session_state.inventory_log = []
 
@@ -40,25 +41,37 @@ st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 st.markdown("""
     <style>
+    /* ZONE 1: RESET & GLOBAL */
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
+    
+    /* ZONE 2: BRANDING */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+    
+    /* ZONE 3: STEP LABELS */
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
+    
+    /* ZONE 4: BOXES */
     .reminder-box { background-color: #FFFBEB !important; border-left: 6px solid #F59E0B !important; padding: 15px; border-radius: 12px; margin: 10px 0; }
     .suggestion-box { background-color: #F0F9FF !important; border-left: 6px solid #0EA5E9 !important; padding: 15px; border-radius: 12px; margin: 10px 0; }
+    
+    /* ZONE 5: INPUTS */
     [data-testid="stTextArea"] textarea { background-color: #F8FAFC !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #E2E8F0 !important; border-radius: 15px !important; }
+    
+    /* ZONE 6: RADIO BUTTON LOCK */
+    div[data-testid="stRadio"] > div { gap: 10px; display: flex; flex-wrap: nowrap; }
+    div[data-testid="stRadio"] label { background-color: #F1F5F9; padding: 12px 25px; border-radius: 12px; font-weight: 900; text-transform: uppercase; border: 2px solid #E2E8F0; transition: 0.3s; }
+    div[data-testid="stRadio"] label[data-checked="true"] { background-color: #0F172A !important; color: #FFFFFF !important; border-color: #22d3ee; box-shadow: 0 4px 15px rgba(34, 211, 238, 0.3); }
+
+    /* ZONE 7: UTILITY BUTTONS */
     .stButton > button { border-radius: 12px !important; font-weight: 950 !important; text-transform: uppercase !important; height: 50px !important; }
     div[class*="st-key-clear_btn"] button { background-color: #F1F5F9 !important; color: #64748B !important; border: 2px solid #E2E8F0 !important; }
-    
-    /* RADIO BUTTON LOCK */
-    div[data-testid="stRadio"] > div { gap: 10px; }
-    div[data-testid="stRadio"] label { background-color: #F1F5F9; padding: 10px 20px; border-radius: 10px; font-weight: 800; text-transform: uppercase; border: 2px solid transparent; transition: 0.2s; }
-    div[data-testid="stRadio"] label[data-checked="true"] { background-color: #0F172A !important; color: white !important; border-color: #22d3ee; }
+    div[class*="st-key-reset_btn"] button { background-color: #0F172A !important; color: #FFFFFF !important; height: 60px !important; margin-top: 40px; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. THE JAVASCRIPT BRIDGE ---
+# --- 4. THE JAVASCRIPT BRIDGE (TRIGGER ENGINE) ---
 st.markdown("""
     <script>
     const doc = window.parent.document;
@@ -75,12 +88,13 @@ st.markdown("""
 # --- 5. UI EXECUTION ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
-# STEP 1
+# STEP 1: SCAN
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
+st.markdown(f'<div class="suggestion-box"><p style="font-size:14px; font-weight:600; margin:0;">{random.choice(TIP_POOL["s1"])}</p></div>', unsafe_allow_html=True)
 img_file = st.camera_input("Scanner", label_visibility="collapsed")
 if img_file: st.session_state.app_state['photo_buffer'] = img_file
 
-# STEP 2
+# STEP 2: DESCRIBE
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
 st.markdown(f'<div class="reminder-box"><p style="font-size:14px; font-weight:600; margin:0;">{random.choice(TIP_POOL["s2"])}</p></div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", key="notes_input", height=100, label_visibility="collapsed")
@@ -88,72 +102,90 @@ if st.button("🗑️ CLEAR DESCRIPTION", key="clear_btn", use_container_width=T
     st.session_state.update({"notes_input": ""})
     st.rerun()
 
-# STEP 3: MARKET LINKS
+# STEP 3: PRICE (MARKET RESEARCH)
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
 st.markdown(f'<div class="suggestion-box"><p style="font-size:14px; font-weight:600; margin:0;">{random.choice(TIP_POOL["s3"])}</p></div>', unsafe_allow_html=True)
 
-analyze_html = """<button onclick="parent.postMessage({type: 'trigger_platform', key: 'EXECUTE_AI'}, '*')" style="width: 100%; height: 70px; background-color: #CC0000; color: white; border: none; border-radius: 15px; font-weight: 950; font-size: 20px; text-transform: uppercase;">🚀 Analyze Market</button>"""
+# BRAIN TRIGGER
+analyze_html = """<button onclick="parent.postMessage({type: 'trigger_platform', key: 'EXECUTE_AI'}, '*')" style="width: 100%; height: 70px; background-color: #CC0000; color: white; border: none; border-radius: 15px; font-weight: 950; font-size: 20px; text-transform: uppercase; cursor: pointer;">🚀 Analyze Market</button>"""
 components.html(analyze_html, height=85)
 
+# THE 4 MARKET RESEARCH LINKS
 market_links_html = f"""
 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
-    <a href="https://www.ebay.com/sch/i.html?_nkw={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #002F6C; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px;">EBAY</a>
-    <a href="https://www.amazon.com/s?k={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #483332; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px;">AMAZON</a>
-    <a href="https://www.google.com/search?q={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #CC0000; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px;">GOOGLE</a>
-    <a href="https://poshmark.com/search?query={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #8C1B2F; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px;">POSH</a>
+    <a href="https://www.ebay.com/sch/i.html?_nkw={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #002F6C; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; text-transform: uppercase;">EBAY</a>
+    <a href="https://www.amazon.com/s?k={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #483332; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; text-transform: uppercase;">AMAZON</a>
+    <a href="https://www.google.com/search?q={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #CC0000; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; text-transform: uppercase;">GOOGLE</a>
+    <a href="https://poshmark.com/search?query={st.session_state.notes_input}" target="_blank" style="height: 60px; background-color: #8C1B2F; color: white; text-decoration: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; text-transform: uppercase;">POSH</a>
 </div>"""
 components.html(market_links_html, height=75)
 
 if st.button("EXECUTE_AI", type="secondary"):
     if st.session_state.app_state['photo_buffer']:
-        parts = [types.Part.from_text(text=f"Analyze: {st.session_state.notes_input}"), types.Part.from_bytes(data=st.session_state.app_state['photo_buffer'].getvalue(), mime_type=st.session_state.app_state['photo_buffer'].type)]
-        st.session_state.app_state['analysis'] = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=parts).text
+        with st.spinner("Brain Processing..."):
+            parts = [types.Part.from_text(text=f"Market analysis: {st.session_state.notes_input}"), types.Part.from_bytes(data=st.session_state.app_state['photo_buffer'].getvalue(), mime_type=st.session_state.app_state['photo_buffer'].type)]
+            st.session_state.app_state['analysis'] = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=parts).text
 
 if st.session_state.app_state['analysis']: st.info(st.session_state.app_state['analysis'])
 
-# STEP 4: LISTING ENGINE
+# STEP 4: LIST (PLATFORM LISTING ENGINE)
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
+st.markdown(f'<div class="reminder-box"><p style="font-size:14px; font-weight:600; margin:0;">{random.choice(TIP_POOL["s4"])}</p></div>', unsafe_allow_html=True)
+
+# STYLE SETTINGS
 st.session_state.app_state['style'] = st.radio("STYLE", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
-platform_html = """
+# THE 4 PLATFORM LISTING TRIGGERS
+platform_grid_html = """
 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;">
-    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_FB'}, '*')" style="height: 60px; background-color: #1877F2; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px;">FB</button>
-    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_EBAY'}, '*')" style="height: 60px; background-color: #002F6C; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px;">EBAY</button>
-    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_CL'}, '*')" style="height: 60px; background-color: #502189; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px;">CL</button>
-    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_POSH'}, '*')" style="height: 60px; background-color: #8C1B2F; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px;">POSH</button>
+    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_FB'}, '*')" style="height: 60px; background-color: #1877F2; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px; cursor: pointer;">FB</button>
+    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_EBAY'}, '*')" style="height: 60px; background-color: #002F6C; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px; cursor: pointer;">EBAY</button>
+    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_CL'}, '*')" style="height: 60px; background-color: #502189; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px; cursor: pointer;">CL</button>
+    <button onclick="parent.postMessage({type: 'trigger_platform', key: 'P_POSH'}, '*')" style="height: 60px; background-color: #8C1B2F; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 11px; cursor: pointer;">POSH</button>
 </div>"""
-components.html(platform_html, height=75)
+components.html(platform_grid_html, height=75)
 
-def gen_list(plat):
-    prompt = f"Write a {st.session_state.app_state['style']} listing for {plat}. Notes: {st.session_state.notes_input}"
-    res = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[prompt])
-    st.session_state.app_state['listing_out'] = res.text
-    st.session_state.inventory_log.append({"Date": datetime.now().strftime("%m/%d"), "Item": st.session_state.notes_input[:20], "Platform": plat, "Style": st.session_state.app_state['style']})
+def generate_listing(platform_name):
+    prompt = f"Write a {st.session_state.app_state['style']} style listing for {platform_name}. Details: {st.session_state.notes_input}"
+    with st.spinner(f"Writing {platform_name} Listing..."):
+        res = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[prompt])
+        st.session_state.app_state['listing_out'] = res.text
+        # Log to Inventory
+        st.session_state.inventory_log.append({
+            "Date": datetime.now().strftime("%m/%d"),
+            "Item": st.session_state.notes_input[:30] + "...",
+            "Platform": platform_name,
+            "Style": st.session_state.app_state['style']
+        })
 
-if st.button("P_FB"): gen_list("Facebook")
-if st.button("P_EBAY"): gen_list("eBay")
-if st.button("P_CL"): gen_list("Craigslist")
-if st.button("P_POSH"): gen_list("Poshmark")
+if st.button("P_FB"): generate_listing("Facebook")
+if st.button("P_EBAY"): generate_listing("eBay")
+if st.button("P_CL"): generate_listing("Craigslist")
+if st.button("P_POSH"): generate_listing("Poshmark")
 
-st.text_area("Listing Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
+st.text_area("Final Listing Output", value=st.session_state.app_state['listing_out'], height=180, label_visibility="collapsed")
 
-# INVENTORY LOG
+# INVENTORY LOG & CSV ENGINE
 st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
 if st.session_state.inventory_log:
     df = pd.DataFrame(st.session_state.inventory_log)
     st.table(df)
-    st.download_button("📥 DOWNLOAD CSV", data=df.to_csv().encode('utf-8'), file_name="inventory.csv", mime="text/csv", use_container_width=True)
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 DOWNLOAD CSV LOG", data=csv, file_name=f"lister_log_{datetime.now().strftime('%Y%m%d')}.csv", mime="text/csv", use_container_width=True)
 
 # STEP 5: SUPPLIES
 st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-supply_html = """
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-    <a href="https://google.com" target="_blank" style="height: 60px; background-color: #CC0000; color: white; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 950; font-size: 14px;">🔍 GOOGLE SHOP</a>
-    <a href="https://amazon.com" target="_blank" style="height: 60px; background-color: #483332; color: white; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 950; font-size: 14px;">🛡️ AMAZON PRO</a>
-</div>"""
-components.html(supply_html, height=85)
+st.markdown(f'<div class="suggestion-box"><p style="font-size:14px; font-weight:600; margin:0;">{random.choice(TIP_POOL["s5"])}</p></div>', unsafe_allow_html=True)
 
-if st.button("🔄 RESET MASTER SESSION", use_container_width=True):
+supply_links_html = """
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+    <a href="https://google.com" target="_blank" style="height: 60px; background-color: #CC0000; color: white; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 950; font-size: 14px; text-transform: uppercase;">🔍 GOOGLE SHOP</a>
+    <a href="https://amazon.com" target="_blank" style="height: 60px; background-color: #483332; color: white; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 950; font-size: 14px; text-transform: uppercase;">🛡️ AMAZON PRO</a>
+</div>"""
+components.html(supply_links_html, height=85)
+
+# RESET SESSION
+if st.button("🔄 RESET MASTER SESSION", key="reset_btn", use_container_width=True):
     st.session_state.app_state = {'analysis': "", 'listing_out': "", 'photo_buffer': None, 'style': "Pro"}
     st.session_state.update({"notes_input": ""})
     st.rerun()
