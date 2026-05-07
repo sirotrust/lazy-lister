@@ -1,48 +1,37 @@
 import streamlit as st
 import pandas as pd
-import time
 from google import genai
+import time
 
-# --- 1. THE CONNECTION ENGINE ---
+# --- 1. THE CONNECTION ENGINE (THE BRAIN) ---
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 except Exception as e:
-    st.error("API Key not found. Check your secrets.toml.")
+    st.error("API Key not found in secrets.toml.")
 
-# --- 2. DYNAMIC CONTENT LIBRARY ---
-# These will rotate every few seconds
-PRO_TIPS = [
-    "Branded mailers increase repeat buyer rates by 15%.",
-    "Natural lighting between 10am-2pm yields the best photos.",
-    "Cross-listing the same item on 3+ platforms doubles sell-through rate.",
-    "Ship within 24 hours to boost your seller search ranking.",
-    "Always include measurements in descriptions to reduce returns."
-]
-
-AI_STRATEGIES = [
-    "Exporting weekly CSV data improves profit forecasting by 40%.",
-    "AI-optimized titles with 60+ characters rank higher in SEO.",
-    "Bundling slow-moving items can clear 25% more inventory monthly.",
-    "Price items 5% higher on Poshmark to account for offer-negotiation.",
-    "Use 'Expert' style for electronics to minimize technical inquiries."
-]
-
-# --- 3. THE ROTATION ENGINE ---
-# Uses session state and time to pick a suggestion
-if "start_time" not in st.session_state:
-    st.session_state.start_time = time.time()
-
-def get_dynamic_content(content_list):
-    # Rotates index every 7 seconds
-    elapsed = int(time.time() - st.session_state.start_time)
-    index = (elapsed // 7) % len(content_list)
-    return content_list[index]
+# --- 2. NEURAL ADVICE ENGINE ---
+# This function pulls "Real World Data" advice directly from the Gemini Brain
+def get_brain_advice(step_name, context):
+    try:
+        # Cache logic to prevent hitting the API every single millisecond
+        current_time = time.time()
+        cache_key = f"advice_{step_name}"
+        
+        if cache_key not in st.session_state or (current_time - st.session_state.get(f"{cache_key}_time", 0) > 10):
+            prompt = f"Give one ultra-concise, professional reseller tip for {step_name}. Context: {context}. Use real-world market data logic. Max 15 words."
+            response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+            st.session_state[cache_key] = response.text
+            st.session_state[f"{cache_key}_time"] = current_time
+            
+        return st.session_state[cache_key]
+    except:
+        return "Analyzing market trends..."
 
 def clear_text_callback():
     st.session_state["notes_input"] = ""
     st.session_state["listing_out"] = ""
 
-# --- 4. ARCHITECTURAL ENGINE (CSS) ---
+# --- 3. ARCHITECTURAL ENGINE (CSS LOCK) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 st.markdown("""
@@ -75,7 +64,7 @@ st.markdown("""
         flex: 1 !important; height: 55px !important; border-radius: 12px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 11px !important;
-        text-transform: uppercase !important; line-height: 55px !important;
+        text-transform: uppercase !important; text-align: center !important; line-height: 55px !important;
     }
     #google-red { background-color: #CC0000 !important; }
     #amz-brown { background-color: #483332 !important; }
@@ -95,7 +84,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 5. UI LAYOUT ---
+# --- 4. UI HEADER ---
 st.markdown(f'''<div class="header-wrapper"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:16px;">PREMIUM RESELLER ASSISTANT</span></div>''', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2, gap="large")
@@ -103,20 +92,21 @@ col1, col2 = st.columns(2, gap="large")
 with col1:
     # STEP 1
     st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">📦 PRO-TIP</span><p class="tip-text">{get_dynamic_content(PRO_TIPS)}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Image Scanning", "Back-camera resolution and lighting")}</p></div>''', unsafe_allow_html=True)
     st.camera_input("Scanner", label_visibility="collapsed")
     
     # STEP 2
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_dynamic_content(AI_STRATEGIES)}</p></div>''', unsafe_allow_html=True)
+    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Item Description", "Using sensory and technical keywords")}</p></div>''', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
     st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, on_click=clear_text_callback)
 
 with col2:
     # STEP 3
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Market Pricing", "Competitor analysis and shipping costs")}</p></div>''', unsafe_allow_html=True)
     st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True)
-    st.markdown(f'''<div class="flex-grid">
+    st.markdown('''<div class="flex-grid">
         <a href="https://www.ebay.com" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
         <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
         <a href="https://www.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
@@ -125,33 +115,30 @@ with col2:
 
     # STEP 4
     st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
+    st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Multi-Platform Listing", "SEO and platform-specific fees")}</p></div>''', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
-    # STEP 4 DYNAMIC GRID
     p1, p2, p3, p4 = st.columns(4)
     if p1.button("FB"):
-        # API Logic here
-        pass
+        st.session_state.listing_out = "Generating Facebook Market listing..."
     if p2.button("EBAY"):
         pass
-    if p3.button("CL"):
-        pass
-    if p4.button("POSH"):
-        pass
 
-    st.text_area("Output", height=150, key="output_area", label_visibility="collapsed")
+    st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
     st.button("📋 COPY LISTING", use_container_width=True)
 
     # STEP 5
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-    st.markdown(f'''<div class="flex-grid">
+    st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Sourcing Supplies", "Bulk discounts and branded packaging")}</p></div>''', unsafe_allow_html=True)
+    st.markdown('''<div class="flex-grid">
         <a href="https://shopping.google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
         <a href="https://www.amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
     </div>''', unsafe_allow_html=True)
 
-# FOOTER LOG
+# INVENTORY LOG
 st.divider()
 st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
+st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🧠 AI STRATEGY</span><p class="tip-text">{get_brain_advice("Inventory Management", "Spreadsheet automation and tax forecasting")}</p></div>''', unsafe_allow_html=True)
 st.table(pd.DataFrame({"Item": ["Scanning..."], "Platform": ["Syncing"], "Price": ["--"]}))
 
 if st.button("🗑️ RESET SESSION", use_container_width=True):
