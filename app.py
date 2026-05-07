@@ -8,70 +8,15 @@ import random
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 except Exception as e:
-    st.error("API Key not found. Please check your secrets.toml.")
+    st.error("API Connection Error.")
 
 # --- 2. THE MASTER 50-TIP NEURAL LIBRARY (DESIGNATED LOCK) ---
 TIP_POOL = {
-    "s1": [
-        "Pro Tip: Use the rear-facing lens; it has 40% higher resolution than the selfie camera.",
-        "Pro Tip: Lock your focus (AE/AF Lock) by holding the screen to prevent 'breathing' shots.",
-        "Pro Tip: Natural window light between 10am-2pm yields the most color-accurate photos.",
-        "Pro Tip: Turn on camera gridlines to ensure your products are perfectly level.",
-        "Pro Tip: Physically move closer to the item; never use digital zoom.",
-        "Pro Tip: Clean your lens with a microfiber cloth before every session.",
-        "Pro Tip: Use a plain white background to help the AI detect item edges instantly.",
-        "Pro Tip: Capture a dedicated shot of the 'Care Tag' for fabric content.",
-        "Pro Tip: Use a white poster board as a reflector to bounce light into shadows.",
-        "Pro Tip: Shoot shoes at a 45-degree 'hero' angle for the best presentation."
-    ],
-    "s2": [
-        "Pro Tip: Always place the Brand Name and Model in the first 3 words.",
-        "Pro Tip: Use sensory words like 'buttery,' 'chunky,' or 'structured'.",
-        "Pro Tip: Mention 'Smoke-Free' or 'Pet-Free' status for buyer confidence.",
-        "Pro Tip: List three mandatory measurements: Pit-to-pit, Length, and Sleeve.",
-        "Pro Tip: Use 'texture' keywords like 'slubby' or 'brushed' for SEO.",
-        "Pro Tip: Describe the 'Vibe'—is it Gorpcore, Dark Academia, or Minimalist?",
-        "Pro Tip: Find the model code on the internal tag for professional data.",
-        "Pro Tip: Disclose pilling or fading early; it reduces return rates by 30%.",
-        "Pro Tip: Be specific with colors; 'Cobalt' ranks better than just 'Blue'.",
-        "Pro Tip: Mention 'Stitch Detail' or 'Quality Hardware' for premium pricing."
-    ],
-    "s3": [
-        "Pro Tip: Check 'Sold' listings only; active prices are just 'wishes'.",
-        "Pro Tip: Price 10-15% higher than average to allow room for negotiations.",
-        "Pro Tip: Items at $24.99 sell significantly faster than flat $25.00.",
-        "Pro Tip: Calculate shipping costs before pricing to protect margins.",
-        "Pro Tip: Cross-reference eBay vs. Poshmark for a true market average.",
-        "Pro Tip: Free Shipping tags increase listing visibility by over 2x.",
-        "Pro Tip: Price vintage based on decade and rarity, not just fashion.",
-        "Pro Tip: Drop prices by 10% on Fridays when buyers receive paychecks.",
-        "Pro Tip: High-demand brands follow very strict MSRP-based resale logic.",
-        "Pro Tip: High-quality photos allow you to price 20% higher than rivals."
-    ],
-    "s4": [
-        "Pro Tip: Use all 80 characters in eBay titles; avoid empty space.",
-        "Pro Tip: Relist items every 30 days to keep 'New Listing' status.",
-        "Pro Tip: Share your Poshmark closet at 9PM EST during peak hours.",
-        "Pro Tip: Include seasonal keywords like 'Summer Essential' for SEO.",
-        "Pro Tip: Never use stock photos alone; platforms de-prioritize them.",
-        "Pro Tip: Copy-paste your top 5 SEO tags into the description footer.",
-        "Pro Tip: Offer 'Combined Shipping' to encourage multi-item orders.",
-        "Pro Tip: Use 'Expert' style for tech to show technical knowledge.",
-        "Pro Tip: On Facebook, respond within 5 mins to keep your 'Badge'.",
-        "Pro Tip: Send 'Offers to Likers' within 10 mins to double conversion."
-    ],
-    "s5": [
-        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months.",
-        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale.",
-        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit.",
-        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers.",
-        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons.",
-        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.'",
-        "Precision Tool: Accurate measurements are mandatory for SEO. Grab the retractable tape I use.",
-        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing.",
-        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable.",
-        "Pro-Level Finish: Thermal 4x6 labels give every package a professional look."
-    ]
+    "s1": ["Pro Tip: Use the rear-facing lens for 40% higher resolution.", "Pro Tip: Lock focus (AE/AF) by holding the screen.", "Pro Tip: Natural light between 10am-2pm is best.", "Pro Tip: Turn on gridlines for perfect leveling.", "Pro Tip: Move closer; never use digital zoom.", "Pro Tip: Clean your lens before every session.", "Pro Tip: Use white backgrounds for AI edge detection.", "Pro Tip: Shoot the care tag for fabric verification.", "Pro Tip: Use white board to reflect light into shadows.", "Pro Tip: Shoot shoes at a 45-degree hero angle."],
+    "s2": ["Pro Tip: Place Brand and Model in the first 3 words.", "Pro Tip: Use words like 'buttery' or 'structured'.", "Pro Tip: Mention 'Smoke-Free' to build buyer trust.", "Pro Tip: List Pit-to-pit, Length, and Sleeve measurements.", "Pro Tip: Use 'texture' keywords like 'slubby' or 'brushed'.", "Pro Tip: Define the Vibe: Is it Gorpcore or Minimalist?", "Pro Tip: Find the model code on the internal tag.", "Pro Tip: Disclose pilling early to reduce returns.", "Pro Tip: Use 'Azure' or 'Cobalt' instead of just 'Blue'.", "Pro Tip: Mention hardware quality for premium items."],
+    "s3": ["Pro Tip: Check 'Sold' listings, not 'Active' ones.", "Pro Tip: Price 10% high to allow for negotiations.", "Pro Tip: $24.99 converts 15% better than $25.00.", "Pro Tip: Weigh items before pricing to calculate shipping.", "Pro Tip: Cross-reference eBay vs Poshmark for averages.", "Pro Tip: Free Shipping tags increase filter hits by 2x.", "Pro Tip: Price vintage on rarity, not just fashion.", "Pro Tip: Drop prices by 10% on Friday afternoons.", "Pro Tip: High-demand brands follow strict MSRP logic.", "Pro Tip: High-quality photos justify a 20% price hike."],
+    "s4": ["Pro Tip: Max out the 80 characters in eBay titles.", "Pro Tip: Relist items every 30 days for 'New' status.", "Pro Tip: Share your Poshmark closet at 9PM EST.", "Pro Tip: Use seasonal keywords like 'Summer Essential'.", "Pro Tip: Never use stock photos alone; AI flags them.", "Pro Tip: Put top 5 SEO tags in the description footer.", "Pro Tip: Use 'Expert' style for tech listings.", "Pro Tip: Respond within 5 mins on FB Marketplace.", "Pro Tip: Send offers within 10 mins of a 'Like'.", "Pro Tip: Combine shipping to encourage multi-buys."],
+    "s5": ["Helpful Suggestion: This Thermal Printer pays for itself. [View Setup]", "Efficiency Upgrade: Scales prevent shipping surcharges. [Secure Yours]", "Visual Advantage: Lighting kits kill yellow tints. [See My Set]", "Boutique Standard: Matte-black mailers win repeat fans. [Shop Bulk]", "Speed Strategy: Steamers remove wrinkles 3x faster. [Check Price]", "Reseller Essential: Forms sell 20% faster than flat-lays. [Check Price]", "Precision Tool: Retractable tape is mandatory for SEO. [See My Pick]", "Workflow Secret: Bulk 6-pack tape saves $12 monthly. [Stock Up]", "Organization Pro: Clear bins keep inventory searchable. [Explore Bins]", "Pro-Level Finish: 4x6 labels give a corporate look. [Shop Labels]"]
 }
 
 def get_random_tip(step_id):
@@ -84,22 +29,17 @@ def analyze_market_logic(img_file, description):
         content_parts = []
         if img_file:
             content_parts.append(types.Part.from_bytes(data=img_file.getvalue(), mime_type=img_file.type))
-        prompt = f"Expert Reseller. Analyze photo or notes: '{description}'. Provide: Value, Demand, and Top 3 Comparative Keywords."
+        prompt = f"Expert Reseller Market Analysis. Notes: {description}. Value and Keywords."
         content_parts.append(types.Part.from_text(text=prompt))
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=content_parts)
-        return response.text
-    except Exception as e:
-        if "429" in str(e): return "Quota Exhausted. Please wait 60 seconds."
-        return f"Brain Error: {str(e)}"
+        return client.models.generate_content(model="gemini-2.0-flash", contents=content_parts).text
+    except Exception as e: return f"Brain Error: {str(e)}"
 
 def generate_listing(platform, details, style):
-    if not details: return "Please enter details in Step 2!"
+    if not details: return "Enter details in Step 2!"
     try:
-        prompt = f"Write a professional {platform} listing. Style: {style}. Details: {details}."
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
-        return response.text
-    except Exception as e:
-        return f"Error: {str(e)}"
+        prompt = f"Write a professional {platform} listing in {style} style: {details}"
+        return client.models.generate_content(model="gemini-2.0-flash", contents=prompt).text
+    except Exception as e: return f"Error: {str(e)}"
 
 # --- 4. THE ARCHITECTURAL ENGINE (UNIFIED HTML/CSS DESIGN LOCK) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
@@ -109,7 +49,7 @@ st.markdown("""
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
 
-    /* HEADER & LABELS */
+    /* HEADER & TEXT */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .sloth-anchor { font-size: 55px; margin-top: -25px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
@@ -126,31 +66,24 @@ st.markdown("""
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; height: 60px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;
-        text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important; text-transform: uppercase !important; line-height: 60px !important; border: none !important;
+        text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important; text-transform: uppercase !important; line-height: 60px !important; border: none !important; cursor: pointer !important;
     }
 
-    /* COLOR PALETTE */
+    /* MODERN ICON PALETTE */
     .fb-blue { background-color: #1877F2 !important; }
     .ebay-blue { background-color: #002F6C !important; }
     .cl-purple { background-color: #502189 !important; }
     .posh-maroon { background-color: #8C1B2F !important; }
     .google-red { background-color: #CC0000 !important; }
     .amz-brown { background-color: #483332 !important; }
+    
+    /* UTILITY COLORS */
+    .utility-clear { background-color: #334155 !important; } /* Charcoal */
+    .utility-copy { background-color: #059669 !important; } /* Emerald */
+    .utility-reset { background-color: #94A3B8 !important; } /* Slate */
 
-    /* NATIVE BUTTON OVERRIDES (DESIGN DIFFERENTIATION) */
-    .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; color: white !important; width: 100% !important; border: none !important; }
-    
-    /* ANALYZE MARKET: RED LOCK */
-    .stButton > button[kind="primary"] { background-color: #CC0000 !important; }
-    
-    /* CLEAR DESCRIPTION: ORANGE UTILITY */
-    div.stButton > button[key="clear_btn"] { background-color: #EA580C !important; }
-    
-    /* COPY LISTING: TEAL SUCCESS */
-    div.stButton > button[key="copy_btn"] { background-color: #0D9488 !important; }
-    
-    /* RESET SESSION: DARK MAROON */
-    div.stButton > button[key="reset_btn"] { background-color: #7F1D1D !important; }
+    /* HIDE NATIVE BUTTONS */
+    .stButton > button { display: none !important; }
 
     /* TEXT AREA */
     [data-testid="stTextArea"] textarea { background-color: #F1F5F9 !important; color: #000000 !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important; }
@@ -170,14 +103,20 @@ with col1:
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">📝 PRO TIP</span><p class="tip-text">{get_random_tip("s2")}</p></div>', unsafe_allow_html=True)
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
-    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, key="clear_btn"):
-        st.session_state.notes_input = ""; st.rerun()
+    
+    # HTML CLEAR BUTTON
+    st.markdown(f'''<div class="flex-grid">
+        <a href="/?action=clear" target="_self" class="m-btn utility-clear">🗑️ CLEAR DESCRIPTION</a>
+    </div>''', unsafe_allow_html=True)
 
 with col2:
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">💰 PRO TIP</span><p class="tip-text">{get_random_tip("s3")}</p></div>', unsafe_allow_html=True)
-    if st.button("🚀 ANALYZE MARKET", use_container_width=True, type="primary"):
-        st.session_state.market_analysis = analyze_market_logic(img_file, notes_input)
+    
+    # HTML ANALYZE BUTTON
+    st.markdown(f'''<div class="flex-grid">
+        <a href="/?action=analyze" target="_self" class="m-btn google-red">🚀 ANALYZE MARKET</a>
+    </div>''', unsafe_allow_html=True)
     if st.session_state.get("market_analysis"): st.info(st.session_state.market_analysis)
 
     st.markdown(f'''<div class="flex-grid">
@@ -191,27 +130,42 @@ with col2:
     st.markdown(f'<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🚀 PRO TIP</span><p class="tip-text">{get_random_tip("s4")}</p></div>', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
+    # HTML STEP 4 GRID
     st.markdown(f'''<div class="flex-grid">
-        <a href="/?platform=Facebook" target="_self" class="m-btn fb-blue">FB</a>
-        <a href="/?platform=eBay" target="_self" class="m-btn ebay-blue">EBAY</a>
-        <a href="/?platform=Craigslist" target="_self" class="m-btn cl-purple">CL</a>
-        <a href="/?platform=Poshmark" target="_self" class="m-btn posh-maroon">POSH</a>
+        <a href="/?platform=Facebook" target="_self" class="m-btn fb-blue">📱 FB</a>
+        <a href="/?platform=eBay" target="_self" class="m-btn ebay-blue">📦 EBAY</a>
+        <a href="/?platform=Craigslist" target="_self" class="m-btn cl-purple">🏘️ CL</a>
+        <a href="/?platform=Poshmark" target="_self" class="m-btn posh-maroon">👗 POSH</a>
     </div>''', unsafe_allow_html=True)
 
-    params = st.query_params
-    if "platform" in params:
-        st.session_state.listing_out = generate_listing(params["platform"], notes_input, selected_style)
-        st.query_params.clear()
-
     st.text_area("Output", value=st.session_state.get('listing_out', ''), height=150, key="output_area", label_visibility="collapsed")
-    st.button("📋 COPY LISTING", use_container_width=True, key="copy_btn")
+    
+    # HTML COPY BUTTON
+    st.markdown(f'''<div class="flex-grid">
+        <a href="/?action=copy" target="_self" class="m-btn utility-copy">📋 COPY LISTING</a>
+    </div>''', unsafe_allow_html=True)
 
     st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
     st.markdown(f'<div class="suggestion-box"><span class="tip-tag" style="color:#0EA5E9;">🤝 YOUR EXPERT PARTNER</span><p class="tip-text">{get_random_tip("s5")}</p></div>', unsafe_allow_html=True)
     st.markdown('''<div class="flex-grid">
-        <a href="YOUR_LINK" target="_blank" class="m-btn google-red">GOOGLE SHOP</a>
-        <a href="YOUR_LINK" target="_blank" class="m-btn amz-brown">AMAZON PRO</a>
+        <a href="YOUR_LINK" target="_blank" class="m-btn google-red">🔍 GOOGLE SHOP</a>
+        <a href="YOUR_LINK" target="_blank" class="m-btn amz-brown">🛡️ AMAZON PRO</a>
     </div>''', unsafe_allow_html=True)
 
-if st.button("🗑️ RESET SESSION", use_container_width=True, key="reset_btn"):
-    st.session_state.clear(); st.rerun()
+# RESET SESSION
+st.markdown(f'''<div class="flex-grid" style="margin-top:50px;">
+    <a href="/?action=reset" target="_self" class="m-btn utility-reset">🔄 RESET SESSION</a>
+</div>''', unsafe_allow_html=True)
+
+# THE BRAIN BRIDGE: Catching HTML clicks via URL
+params = st.query_params
+if "action" in params:
+    act = params["action"]
+    if act == "clear": st.session_state.notes_input = ""; st.rerun()
+    if act == "analyze": st.session_state.market_analysis = analyze_market_logic(img_file, notes_input)
+    if act == "reset": st.session_state.clear(); st.rerun()
+    st.query_params.clear()
+
+if "platform" in params:
+    st.session_state.listing_out = generate_listing(params["platform"], notes_input, selected_style)
+    st.query_params.clear()
