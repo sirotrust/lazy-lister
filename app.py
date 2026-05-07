@@ -6,20 +6,25 @@ from google import genai
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 except Exception as e:
-    st.error("API Key not found. Check your secrets.toml or Streamlit Cloud Secrets.")
+    st.error("API Key not found. Check your secrets.toml.")
 
 def generate_listing(platform, details, style):
-    """Hidden logic to craft the listing without refreshing the page."""
     if not details:
         return "Please enter details in Step 2 first!"
     try:
-        prompt = f"Write a high-converting {platform} listing. Style: {style}. Details: {details}."
+        prompt = f"Write a professional {platform} listing. Style: {style}. Details: {details}."
         response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
         return response.text
     except Exception as e:
         return f"Error: {str(e)}"
 
-# --- 2. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
+# --- 2. CALLBACK FIX FOR CLEAR BUTTON ---
+def clear_text_callback():
+    """The only safe way to clear widgets with keys in Streamlit."""
+    st.session_state["notes_input"] = ""
+    st.session_state["listing_out"] = ""
+
+# --- 3. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 st.markdown("""
@@ -107,7 +112,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. HEADER ---
+# --- 4. HEADER ---
 st.markdown('''
     <div class="header-wrapper">
         <div class="title-container">
@@ -129,15 +134,11 @@ with col1:
     st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
     st.markdown('<span class="step-instruction">Describe vibe, texture, and silhouette.</span>', unsafe_allow_html=True)
     
-    # Use session state to handle text area values safely
+    # Widget initialization
     notes_input = st.text_area("Notes", placeholder="buttery, chunky, structured...", height=150, key="notes_input", label_visibility="collapsed")
     
-    if st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True):
-        # The designed-safe way to clear widgets with keys
-        st.session_state["notes_input"] = ""
-        if "listing_out" in st.session_state:
-            st.session_state["listing_out"] = ""
-        st.rerun()
+    # Callback integration prevents the SessionState error
+    st.button("🗑️ CLEAR DESCRIPTION", use_container_width=True, on_click=clear_text_callback)
 
 with col2:
     st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
@@ -181,7 +182,7 @@ with col2:
         </div>
     ''', unsafe_allow_html=True)
 
-# --- 4. INVENTORY LOG ---
+# --- 5. INVENTORY LOG ---
 st.divider()
 st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
 ghost_data = pd.DataFrame({"Item": ["Scanning..."], "Platform": ["Syncing"], "Price": ["--"]})
