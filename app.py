@@ -16,7 +16,7 @@ TIP_POOL = {
     "s1": [
         "Pro Tip: Clean your lens with a microfiber cloth before every shoot.",
         "Pro Tip: Shoot at a 45-degree 'hero' angle to show depth and scale.",
-        "Pro Tip: Modern 'Portrait Mode' helps blur busy backgrounds for focus.",
+        "Pro Tip: Modern 'Portrait Mode' helps blur busy backgrounds.",
         "Pro Tip: Always photograph the care tag; buyers search for fabric content.",
         "Pro Tip: A white foam board reflector helps bounce light into shadows.",
         "Pro Tip: Capture 'Scale' by placing a coin or ruler next to small items.",
@@ -30,9 +30,9 @@ TIP_POOL = {
         "Pro Tip: Use 'NWT' or 'EUC' in titles for rapid condition scanning.",
         "Pro Tip: List three specific measurements: Pit-to-pit, length, and sleeve.",
         "Pro Tip: Use 'texture' keywords like 'slubby,' 'pebbled,' or 'brushed'.",
-        "Pro Tip: Mention if an item comes from a 'Smoke-Free' or 'Pet-Free' home.",
+        "Pro Tip: Mention if an item comes from a 'Smoke-Free' home.",
         "Pro Tip: Add a 'Style Note' on how to wear the item to inspire buyers.",
-        "Pro Tip: Define the 'Vibe': Is it Gorpcore, Dark Academia, or Streetwear?.",
+        "Pro Tip: Define the 'Vibe': Is it Gorpcore, Dark Academia, or Streetwear?",
         "Pro Tip: Use the 'Model Code' from the tag to find pro stock info.",
         "Pro Tip: Be specific about color; use 'Cobalt' instead of just 'Blue'.",
         "Pro Tip: Mention 'Stitch Detail' or 'Quality Hardware' for luxury items."
@@ -46,7 +46,7 @@ TIP_POOL = {
         "Pro Tip: 'Free Shipping' tags get 2x more visibility in user filters.",
         "Pro Tip: Price vintage on decade and rarity, not just condition.",
         "Pro Tip: Drop prices by 10% on Fridays when buyers receive paychecks.",
-        "Pro Tip: High-demand brands (Nike, Lululemon) follow MSRP-logic.",
+        "Pro Tip: High-demand brands follow strict MSRP-logic.",
         "Pro Tip: Better photos allow you to price higher than the competition."
     ],
     "s4": [
@@ -62,16 +62,16 @@ TIP_POOL = {
         "Pro Tip: Use 'Simple' style for fast-moving trendy mall brands."
     ],
     "s5": [
-        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months..",
-        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale..",
-        "Visual Advantage: Kill the 'Yellow Tint' in your photos instantly with a curated lighting kit..",
-        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers..",
-        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons..",
-        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.'.",
-        "Precision Tool: Accurate measurements are mandatory for SEO. Retractable tape is a must-have..",
-        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-roll pricing..",
-        "Organization Pro: Clear bin storage keeps inventory dust-free and instantly searchable..",
-        "Pro-Level Finish: Thermal 4x6 labels give every package a 'corporate' professional look.."
+        "Helpful Suggestion: Stop overpaying for ink. This Thermal Printer pays for itself in 3 months.",
+        "Efficiency Upgrade: Eliminate 'Underweight' surcharges with a high-precision digital scale.",
+        "Visual Advantage: Kill the 'Yellow Tint' in your photos with a curated lighting kit.",
+        "Boutique Standard: Buyers notice quality mailers. These matte-black mailers earn repeat customers.",
+        "Speed Strategy: Handheld fabric steamers remove wrinkles 3x faster than traditional irons.",
+        "Reseller Essential: Items on a mannequin sell 20% faster than 'flat-lays.'",
+        "Precision Tool: Accurate measurements are mandatory for SEO. Retractable tape is a must-have.",
+        "Workflow Secret: Bulk 6-pack shipping tape saves $12 monthly over single-rolls.",
+        "Organization Pro: Clear bin storage keeps inventory dust-free and searchable.",
+        "Pro-Level Finish: Thermal 4x6 labels give every package a professional look."
     ]
 }
 
@@ -107,52 +107,57 @@ def clear_text_callback():
     if "market_analysis" in st.session_state:
         st.session_state["market_analysis"] = ""
 
-# --- 3. ARCHITECTURAL ENGINE (CSS LOCK - REINFORCED) ---
+# --- 3. ARCHITECTURAL ENGINE (ULTIMATE DESIGN LOCK) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 st.markdown("""
     <style>
+    /* GLOBAL RESET & BACKGROUND */
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
-    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {
-        color: #0F172A !important; font-weight: 800 !important;
-    }
-    [data-testid="stTextArea"] textarea {
-        background-color: #F1F5F9 !important; color: #000000 !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important;
-    }
+
+    /* STEP LABELS & INSTRUCTIONS */
+    .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 3px solid #0F172A; display: inline-block; }
+    .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
+    .sloth-anchor { font-size: 55px; margin-top: -25px; }
+    .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+
+    /* BOX STYLING */
     .reminder-box, .suggestion-box { padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid; }
     .reminder-box { background-color: #FFFBEB !important; border-left: 6px solid #F59E0B !important; border-color: #FEF3C7; }
     .suggestion-box { background-color: #F0F9FF !important; border-left: 6px solid #0EA5E9 !important; border-color: #E0F2FE; }
     .tip-tag { font-weight: 950; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 2px; }
     .tip-text { color: #1E293B !important; font-size: 14px; font-weight: 600; line-height: 1.4; }
-    .header-wrapper { margin-top: 30px; margin-bottom: 40px; }
-    .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
-    .sloth-anchor { font-size: 55px; margin-top: -25px; }
-    .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
-    .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 3px solid #0F172A; display: inline-block; }
-    
-    /* REINFORCED BUTTON DESIGN: TARGETING BY LABEL CONTENT TO PREVENT COLOR LOSS */
-    .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; border: none !important; color: white !important; width: 100% !important; }
-    
-    /* TARGETING BUTTONS BY TEXT TO ENSURE BRAND COLORS REMAIN STATIC */
-    button[p-typed-value="FB"] { background-color: #1877F2 !important; }
-    button[p-typed-value="EBAY"] { background-color: #002F6C !important; }
-    button[p-typed-value="CL"] { background-color: #502189 !important; }
-    button[p-typed-value="POSH"] { background-color: #8C1B2F !important; }
 
+    /* TEXT AREA STYLING */
+    [data-testid="stTextArea"] textarea { background-color: #F1F5F9 !important; color: #000000 !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important; }
+
+    /* THE BUTTON LOCK: TARGETING BY DATA-TESTID & INNER TEXT */
+    .stButton > button { border-radius: 12px !important; height: 60px !important; font-weight: 950 !important; text-transform: uppercase !important; border: none !important; color: white !important; width: 100% !important; transition: transform 0.1s ease; }
+    .stButton > button:active { transform: scale(0.98); }
+
+    /* STEP 4: PERMANENT COLOR MAPPING */
+    /* We use the attribute selector to find buttons by their label text */
+    div[data-testid="stVerticalBlock"] button p:contains("FB") { color: transparent !important; }
+    .stButton:has(button p:contains("FB")) button { background-color: #1877F2 !important; }
+    .stButton:has(button p:contains("EBAY")) button { background-color: #002F6C !important; }
+    .stButton:has(button p:contains("CL")) button { background-color: #502189 !important; }
+    .stButton:has(button p:contains("POSH")) button { background-color: #8C1B2F !important; }
+
+    /* STEP 3 & 5 FLEX GRID LINKS */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1 !important; height: 60px !important; border-radius: 12px !important; display: flex !important; align-items: center !important; justify-content: center !important;
         text-decoration: none !important; color: white !important; font-weight: 950 !important; font-size: 12px !important; text-transform: uppercase !important; text-align: center !important; line-height: 60px !important;
     }
-    #google-red { background-color: #CC0000 !important; }
-    #amz-brown { background-color: #483332 !important; }
     #ebay-blue { background-color: #002F6C !important; }
+    #amz-brown { background-color: #483332 !important; }
+    #google-red { background-color: #CC0000 !important; }
     #posh-maroon { background-color: #8C1B2F !important; }
     </style>
 """, unsafe_allow_html=True)
 
 # --- 4. UI LAYOUT ---
-st.markdown(f'''<div class="header-wrapper"><div class="title-container"><span class="brand-word">LAZY</span><span class="sloth-anchor">🦥</span><span class="brand-word">LISTER</span></div><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>''', unsafe_allow_html=True)
+st.markdown(f'''<div style="margin-top: 30px; margin-bottom: 40px;"><div style="display: flex; align-items: center; gap: 12px;"><span class="brand-word">LAZY</span><span class="sloth-anchor">🦥</span><span class="brand-word">LISTER</span></div><span class="neon-text" style="font-size:18px; margin-top: 10px; display: block;">PREMIUM RESELLER ASSISTANT</span></div>''', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2, gap="large")
 
@@ -174,6 +179,7 @@ with col2:
     if st.session_state.get("market_analysis"):
         st.info(st.session_state.market_analysis)
 
+    # EXTERNAL LINKS
     st.markdown(f'''<div class="flex-grid">
         <a href="https://www.ebay.com/sch/i.html?_nkw={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
         <a href="https://www.amazon.com/s?k={st.session_state.get('notes_input', '')}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
@@ -185,7 +191,7 @@ with col2:
     st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color:#F59E0B;">🚀 PRO TIP</span><p class="tip-text">{get_random_tip("s4")}</p></div>''', unsafe_allow_html=True)
     selected_style = st.radio("STYLE:", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
     
-    # REINFORCED BUTTONS WITH UNIQUE LABELS FOR CSS TARGETING
+    # STEP 4 BUTTONS
     p1, p2, p3, p4 = st.columns(4)
     if p1.button("FB"): st.session_state.listing_out = generate_listing("Facebook", notes_input, selected_style)
     if p2.button("EBAY"): st.session_state.listing_out = generate_listing("eBay", notes_input, selected_style)
