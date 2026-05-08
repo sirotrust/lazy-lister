@@ -13,41 +13,34 @@ if 'inventory' not in st.session_state:
 if 'app_state' not in st.session_state:
     st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro"}
 
-# Google Client Handshake
+# Google Client Handshake (Stable 1.5 Flash Engine)
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    LITE_MODEL = "gemini-2.0-flash-lite-preview"
+    LITE_MODEL = "gemini-1.5-flash"
 except Exception:
     st.error("LEAD DEV: API Handshake Failed.")
 
-# --- 2. THE MASTERPIECE CSS (RESTORED 1-FOR-1) ---
+# --- 2. MASTERPIECE CSS (ZONE A-D) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
 
-    /* ZONE 1: RADIO & LABEL VISIBILITY */
+    /* ZONE 1-4: STEP DESIGN */
     [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {
         color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
     }
-
-    /* ZONE 2: TABLE CONTRAST */
     [data-testid="stTable"] td, [data-testid="stTable"] th {
         color: #0F172A !important; background-color: #F8FAFC !important; font-weight: 600 !important; border: 1px solid #E2E8F0 !important;
     }
-
-    /* ZONE 3: TEXT INPUTS */
     [data-testid="stTextArea"] textarea {
-        background-color: #F1F5F9 !important; color: #0F172A !important; -webkit-text-fill-color: #0F172A !important;
-        font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important;
+        background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important;
     }
 
-    /* ZONE 4: BRANDING */
+    /* ZONE 5: BRANDING & BUTTONS */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
-
-    /* ZONE 5: BUTTON GRID LOCK & IDs */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
@@ -59,11 +52,12 @@ st.markdown("""
     #posh-maroon { background-color: #8C1B2F !important; }
     #fb-blue { background-color: #1877F2 !important; }
     #cl-purple { background-color: #502189 !important; }
+
+    /* ZONE D: SIDEBAR HIDER (ENGINE ROOM) */
+    [data-testid="stSidebar"] { display: none !important; }
     
-    /* GHOST TRIGGER STYLING (HIDDEN AT BOTTOM) */
-    div.stButton > button[kind="secondary"] {
-        position: fixed; bottom: -100px; left: 0; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none;
-    }
+    /* BUFFER ZONE SPACING */
+    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -72,13 +66,12 @@ st.components.v1.html("""
 <script>
 const doc = window.parent.document;
 const trigger = (key) => {
+    // Bridges the Design to the Hidden Sidebar
     const btns = Array.from(doc.querySelectorAll('button'));
     const target = btns.find(el => el.innerText.includes(key));
     if (target) target.click();
 };
-
 doc.addEventListener('click', (e) => {
-    // Intercept clicks on original HTML IDs to fire Ghost Triggers
     if (e.target.id === 'fb-blue') trigger('GHOST_FB');
     if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
     if (e.target.id === 'cl-purple') trigger('GHOST_CL');
@@ -87,10 +80,10 @@ doc.addEventListener('click', (e) => {
 </script>
 """, height=0)
 
-# --- 4. UI EXECUTION (RESTORED MASTERPIECE) ---
+# --- 4. ZONE A & B: UI EXECUTION ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
-# STEP 1: SCAN (Battery Release Logic)
+# STEP 1: SCAN
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
@@ -99,7 +92,6 @@ if 'hero_shot' not in st.session_state:
         st.session_state.img_type = img_file.type
         st.rerun()
 else:
-    # Camera is now released; show preview only
     st.image(st.session_state.hero_shot, use_container_width=True)
     if st.button("📸 RETAKE PHOTO", use_container_width=True):
         del st.session_state.hero_shot
@@ -114,13 +106,10 @@ st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span><
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
     if 'hero_shot' in st.session_state:
         with st.spinner("Brain Processing..."):
-            # Data Transformer for Google API
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             response = client.models.generate_content(model=LITE_MODEL, contents=[notes, part])
             st.session_state.app_state['analysis'] = response.text
-
-if st.session_state.app_state['analysis']:
-    st.info(st.session_state.app_state['analysis'])
+if st.session_state.app_state['analysis']: st.info(st.session_state.app_state['analysis'])
 
 st.markdown(f'''
     <div class="flex-grid">
@@ -133,8 +122,8 @@ st.markdown(f'''
 
 # STEP 4: LIST
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-style_choice = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
-st.session_state.app_state['style'] = style_choice
+style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
+st.session_state.app_state['style'] = style
 
 st.markdown(f'''
     <div class="flex-grid">
@@ -147,19 +136,28 @@ st.markdown(f'''
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# --- 5. THE GHOST TRIGGERS (REMOTE) ---
-def run_ghost(p):
-    with st.spinner(f"Writing {p} Listing..."):
-        prompt = f"Write a {st.session_state.app_state['style']} {p} listing based on these notes: {notes}"
-        res = client.models.generate_content(model=LITE_MODEL, contents=[prompt])
-        st.session_state.app_state['listing_out'] = res.text
-        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
+# STEP 5: SUPPLIES
+st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
+st.markdown('''
+    <div class="flex-grid">
+        <a href="https://google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
+        <a href="https://amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
+    </div>
+''', unsafe_allow_html=True)
 
-if st.button("GHOST_FB", type="secondary"): run_ghost("Facebook")
-if st.button("GHOST_EBAY", type="secondary"): run_ghost("eBay")
-if st.button("GHOST_CL", type="secondary"): run_ghost("Craigslist")
-if st.button("GHOST_POSH", type="secondary"): run_ghost("Poshmark")
+# --- 5. ZONE C: THE BUFFER ZONE (FUTURE AFFILIATES/CONTACT) ---
+st.markdown('<div class="buffer-box">', unsafe_allow_html=True)
+# This space is reserved for Marketing & Contact Portals
+st.write("&nbsp;") 
+st.write("&nbsp;")
+st.markdown('</div>', unsafe_allow_html=True)
 
-# INVENTORY LOG
+# --- 6. ZONE D: THE DATA FOUNDATION (INVENTORY LOG) ---
 st.divider()
-st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Empty..."], "Platform": ["--"], "Date": ["--"]}))
+st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Ready..."], "Platform": ["--"], "Date": ["--"]}))
+
+# --- 7. THE ENGINE ROOM (INVISIBLE SIDEBAR) ---
+with st.sidebar:
+    def run_ghost(p):
+        with st.spinner(f"Writing {p}..."):
+            res = client.models.generate_content(model=LITE_
