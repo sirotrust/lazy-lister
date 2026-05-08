@@ -160,4 +160,11 @@ st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory 
 with st.sidebar:
     def run_ghost(p):
         with st.spinner(f"Writing {p}..."):
-            res = client.models.generate_content(model=LITE_
+            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {st.session_state.app_state['style']} {p} listing: {notes}"])
+            st.session_state.app_state['listing_out'] = res.text
+            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
+
+    if st.button("GHOST_FB"): run_ghost("Facebook")
+    if st.button("GHOST_EBAY"): run_ghost("eBay")
+    if st.button("GHOST_CL"): run_ghost("Craigslist")
+    if st.button("GHOST_POSH"): run_ghost("Poshmark")
