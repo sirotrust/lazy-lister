@@ -115,7 +115,6 @@ st.markdown(f"""
 st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Take a photo of your item</div>', unsafe_allow_html=True)
 
-# Pro Tip moved above camera input
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
 
 if 'hero_shot' not in st.session_state:
@@ -151,12 +150,10 @@ with stylable_container("analyze_btn", css_styles="""button {background: #0F172A
                 res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
                 st.session_state.app_state['master_id'] = res.text
                 
-                # THE "NOVEL" FIX: Max 10 words
                 sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Name 2 specific packing supplies for {res.text}. Maximum 10 words total. Be extremely brief."])
                 st.session_state.app_state['supply_tips'] = sup_res.text
                 st.rerun()
 
-# Pro Tip moved between Analyze Button and Text Area
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
 notes = st.text_area("Notes", height=100, placeholder="Describe your item details...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
@@ -164,6 +161,10 @@ notes = st.text_area("Notes", height=100, placeholder="Describe your item detail
 # --- STEP 3: PRICE ---
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Compare market value</div>', unsafe_allow_html=True)
+
+# Pro Tip positioned above the buttons
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
+
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -174,12 +175,13 @@ st.markdown(f'''
         <a href="https://poshmark.com/search?query={sq}" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 14px; background: linear-gradient(45deg, #8C1B2F, #4c0519);">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
+
 
 # --- STEP 4: LIST ---
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
+
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
 
 c1, c2, c3 = st.columns(3)
@@ -211,7 +213,6 @@ if 'action_trigger' in st.session_state.app_state:
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# THE CLIPBOARD FIX
 if st.session_state.app_state['listing_out']:
     safe_text = json.dumps(st.session_state.app_state['listing_out'])
     copy_html = f"""
