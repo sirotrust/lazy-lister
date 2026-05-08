@@ -83,7 +83,16 @@ st.markdown(f"""
         display: block; width: 100%;
         background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        line-height: 1.0; letter-spacing: -1px; border-bottom: 4px solid #F8FAFC;
+        line-height: 1.0; letter-spacing: -1px;
+    }}
+    
+    /* SUB-STEP INSTRUCTIONS (14px Bold) */
+    .step-sub-label {{
+        font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 20px;
+        background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        white-space: nowrap; overflow: hidden; display: block;
+        border-bottom: 4px solid #F8FAFC; padding-bottom: 5px;
     }}
 
     /* PLATFORM BUTTONS (NO UNDERLINE) */
@@ -118,7 +127,7 @@ st.markdown("""
 <div class="instruction-container">
     <div class="instruction-row"><div class="instruction-num">1</div><div class="instruction-text">SCAN — Capture image</div></div>
     <div class="instruction-row"><div class="instruction-num">2</div><div class="instruction-text">ANALYZE — Extract data</div></div>
-    <div class="instruction-row"><div class="instruction-num">3</div><div class="instruction-text">PRICE — Market comps</div></div>
+    <div class="instruction-row"><div class="instruction-num">3</div><div class="instruction-text">MARKET COMPARISONS — Market comps</div></div>
     <div class="instruction-row"><div class="instruction-num">4</div><div class="instruction-text">LIST — Generate copy</div></div>
     <div class="instruction-row"><div class="instruction-num">5</div><div class="instruction-text">SUPPLY — Packing tools</div></div>
     <div class="instruction-row"><div class="instruction-num">6</div><div class="instruction-text">VAULT — Archive entry</div></div>
@@ -127,6 +136,7 @@ st.markdown("""
 
 # STEP 1: SCAN
 st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Take a photo of your item</div>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -145,6 +155,7 @@ else:
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Describe your item if logo is uncommon or not visible</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
 if st.button("ANALYZE", use_container_width=True):
@@ -152,20 +163,16 @@ if st.button("ANALYZE", use_container_width=True):
         with st.spinner("Analyzing Foregrounds..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-            
-            # REFINED PROMPT FOR ISOLATION
-            isolation_prompt = f"Identify only the SINGLE primary item in the foreground. Ignore backgrounds, hands, tables, or furniture it is sitting on. Combine with notes: {notes}. Provide a clean 5-word professional title."
-            
+            isolation_prompt = f"Identify only the SINGLE primary item in the foreground. Ignore backgrounds and tables. Combine with notes: {notes}. Provide a clean 5-word professional title."
             res = client.models.generate_content(model=LITE_MODEL, contents=[isolation_prompt, part])
             st.session_state.app_state['master_id'] = res.text
-            
-            # Step 5 Pre-load
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 specific packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
 # STEP 3: PRICE
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Analyze live market comparisons for accurate pricing</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -179,6 +186,7 @@ st.markdown(f'''
 
 # STEP 4: LIST
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Choose your listing style and generate copy instantly</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -193,6 +201,7 @@ st.text_area("Output", value=st.session_state.app_state['listing_out'], height=1
 
 # STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Access professional shipping and packing tools</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -205,6 +214,7 @@ st.markdown(f'''
 
 # STEP 6: INVENTORY
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">View and manage your secure inventory archive</div>', unsafe_allow_html=True)
 if st.session_state.inventory:
     st.table(pd.DataFrame(st.session_state.inventory))
 
