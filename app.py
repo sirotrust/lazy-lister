@@ -4,7 +4,7 @@ import urllib.parse
 from datetime import datetime
 from google import genai
 from google.genai import types
-from streamlit_extras.stylable_container import stylable_container # THE COMMUNITY FIX
+from streamlit_extras.stylable_container import stylable_container
 
 # --- 1. THE PRO TIP LIBRARY (60 ENTRIES) ---
 TIP_LIBRARY = {
@@ -32,6 +32,24 @@ def get_pro_tip(step_num):
     idx = st.session_state.app_state['tip_idx'] % 10
     return TIP_LIBRARY[str(step_num)][idx]
 
+# --- 2b. SILENT ACTION LISTENER (Prevents Reset) ---
+params = st.query_params
+if "action" in params:
+    action = params.get("action")
+    ctx = st.session_state.app_state['master_id']
+    if ctx:
+        try:
+            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+            style = st.session_state.get("style_radio", "Simple")
+            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {action} listing for: {ctx}"])
+            st.session_state.app_state['listing_out'] = res.text
+            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": action.upper()})
+            st.session_state.app_state['tip_idx'] += 1
+            st.query_params.clear()
+            st.rerun()
+        except: 
+            st.query_params.clear()
+
 # --- 3. UI ARCHITECTURE (CSS) ---
 st.markdown(f"""
     <style>
@@ -43,49 +61,42 @@ st.markdown(f"""
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 16px !important; }}
     
     /* RADIO BUTTON FIX */
-    [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{
-        color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
-    }}
+    [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{ color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important; }}
 
     /* TOP NAV MANUAL */
     .instruction-container {{ margin: 15px 0 25px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
-    .instruction-text {{ 
-        font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; 
-        background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        white-space: nowrap; 
-    }}
+    .instruction-text {{ font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }}
 
     /* STEP LABELS */
-    .step-label {{ 
-        font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; 
-        display: block; width: 100%;
-        background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        line-height: 1.0; letter-spacing: -0.5px;
-    }}
-    
-    .step-sub-label {{
-        font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;
-        background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        white-space: nowrap; display: block; border-bottom: 2px solid #F1F5F9; padding-bottom: 5px;
-    }}
+    .step-label {{ font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; display: block; width: 100%; background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.0; letter-spacing: -0.5px; }}
+    .step-sub-label {{ font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; display: block; border-bottom: 2px solid #F1F5F9; padding-bottom: 5px; }}
 
     /* THE PRO TIP BOX */
-    .pro-tip-box {{
-        background: #F8FAFC; border-left: 4px solid #002F6C; padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0;
-    }}
+    .pro-tip-box {{ background: #F8FAFC; border-left: 4px solid #002F6C; padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0; }}
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* GLOBAL NATIVE BUTTONS (STEP 1 & 2) */
-    .stButton button {{
-        height: 70px !important; border-radius: 14px !important; font-weight: 950 !important;
-        font-size: 22px !important; background: #0F172A !important; 
-        color: white !important; border: none !important;
-        text-transform: uppercase !important; letter-spacing: 1px !important; width: 100%;
+    /* GLOBAL NATIVE BUTTONS */
+    .stButton button, .stLinkButton a {{
+        height: 65px !important; border-radius: 14px !important; font-weight: 950 !important;
+        font-size: 22px !important; text-transform: uppercase !important; letter-spacing: 1px !important; width: 100%;
+    }}
+    
+    /* MOBILE SIDE-BY-SIDE OVERRIDE FOR COLUMNS */
+    @media (max-width: 640px) {{
+        [data-testid="stHorizontalBlock"] {{
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 5px !important;
+        }}
+        [data-testid="column"] {{
+            width: auto !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+        }}
+        /* Shrink text slightly on mobile so it fits in the row */
+        .stButton button p, .stLinkButton a p {{ font-size: 12px !important; }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -116,36 +127,38 @@ if 'hero_shot' not in st.session_state:
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
     st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
-    if st.button("ADD ITEM", use_container_width=True):
-        st.session_state.app_state['tip_idx'] += 1
-        for key in ['hero_shot', 'img_type']:
-            if key in st.session_state: del st.session_state[key]
-        st.session_state.app_state['master_id'] = ""
-        st.session_state.app_state['listing_out'] = ""
-        st.session_state.app_state['scan_count'] += 1 
-        st.rerun()
+    with stylable_container("add_btn", css_styles="""button {background: #0F172A !important; color: white !important;} p {color: white !important;}"""):
+        if st.button("ADD ITEM", use_container_width=True):
+            st.session_state.app_state['tip_idx'] += 1
+            for key in ['hero_shot', 'img_type']:
+                if key in st.session_state: del st.session_state[key]
+            st.session_state.app_state['master_id'] = ""
+            st.session_state.app_state['listing_out'] = ""
+            st.session_state.app_state['scan_count'] += 1 
+            st.rerun()
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
-if st.button("ANALYZE", use_container_width=True):
-    st.session_state.app_state['tip_idx'] += 1
-    if 'hero_shot' in st.session_state:
-        with st.spinner("Surgical Brand Scan..."):
-            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-            part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-            surgical_prompt = f"Professional item identification. Discard backgrounds. Identify exact BRAND and MODEL. Notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
-            res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
-            st.session_state.app_state['master_id'] = res.text
-            sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
-            st.session_state.app_state['supply_tips'] = sup_res.text
-            st.rerun()
+with stylable_container("analyze_btn", css_styles="""button {background: #0F172A !important; color: white !important;} p {color: white !important;}"""):
+    if st.button("ANALYZE", use_container_width=True):
+        st.session_state.app_state['tip_idx'] += 1
+        if 'hero_shot' in st.session_state:
+            with st.spinner("Surgical Brand Scan..."):
+                client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+                part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
+                surgical_prompt = f"Professional item identification. Discard backgrounds. Identify exact BRAND and MODEL. Notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
+                res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
+                st.session_state.app_state['master_id'] = res.text
+                sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
+                st.session_state.app_state['supply_tips'] = sup_res.text
+                st.rerun()
 
 notes = st.text_area("Notes", height=100, placeholder="Describe your item details...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
-# STEP 3: PRICE (HTML Anchors fine here because they link out externally)
+# STEP 3: PRICE 
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Compare market value</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
@@ -160,28 +173,26 @@ st.markdown(f'''
 ''', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
 
-# STEP 4: LIST (NATIVE BUTTONS WITH CUSTOM CSS CONTAINERS)
+# STEP 4: LIST 
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
 
-# THE FIX: stylable_container overrides Shadow DOM restrictions locally
 c1, c2, c3 = st.columns(3)
 with c1:
-    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; font-size: 16px !important; height: 60px !important;}"""):
+    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; border: none !important;} p {color: white !important;}"""):
         if st.button("FACEBOOK", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "FACEBOOK"
 with c2:
-    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; font-size: 16px !important; height: 60px !important;}"""):
+    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; border: none !important;} p {color: white !important;}"""):
         if st.button("EBAY", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "EBAY"
 with c3:
-    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; font-size: 16px !important; height: 60px !important;}"""):
+    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; border: none !important;} p {color: white !important;}"""):
         if st.button("POSHMARK", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "POSHMARK"
 
-# Backend Logic (Triggers immediately, NO URL Params)
 if 'action_trigger' in st.session_state.app_state:
     plat = st.session_state.app_state.pop('action_trigger')
     ctx = st.session_state.app_state['master_id']
@@ -197,7 +208,7 @@ if 'action_trigger' in st.session_state.app_state:
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# STEP 5: SUPPLIES (ST.LINK_BUTTON WITH CUSTOM CSS CONTAINER)
+# STEP 5: SUPPLIES (ST.LINK_BUTTON COLOR FIX)
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
@@ -205,10 +216,10 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
 s1, s2 = st.columns(2)
 with s1:
-    with stylable_container("amz_btn", css_styles="""button {background-color: #483332 !important; font-size: 16px !important; height: 60px !important;}"""):
+    with stylable_container("amz_btn", css_styles="""button, a {background-color: #483332 !important; border: none !important;} p {color: white !important;}"""):
         st.link_button("AMAZON", url=f"https://www.amazon.com/s?k={supply_q}", use_container_width=True)
 with s2:
-    with stylable_container("goog_btn", css_styles="""button {background-color: #CC0000 !important; font-size: 16px !important; height: 60px !important;}"""):
+    with stylable_container("goog_btn", css_styles="""button, a {background-color: #CC0000 !important; border: none !important;} p {color: white !important;}"""):
         st.link_button("GOOGLE", url=f"https://www.google.com/search?q={supply_q}+shipping&tbm=shop", use_container_width=True)
 
 if st.session_state.app_state['supply_tips']: 
