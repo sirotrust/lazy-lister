@@ -13,14 +13,15 @@ if 'inventory' not in st.session_state:
 if 'app_state' not in st.session_state:
     st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro"}
 
-# Google Client Handshake (Stable 1.5 Flash Engine)
+# Google Client Handshake (Final Stable Handshake)
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    LITE_MODEL = "gemini-1.5-flash"
+    # FIXED MODEL STRING TO PREVENT 404
+    LITE_MODEL = "models/gemini-1.5-flash-latest"
 except Exception:
     st.error("LEAD DEV: API Handshake Failed.")
 
-# --- 2. MASTERPIECE CSS (ZONE A-D) ---
+# --- 2. MASTERPIECE CSS (RESTORATION FROM ARCH1) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -57,7 +58,7 @@ st.markdown("""
     [data-testid="stSidebar"] { display: none !important; }
     
     /* BUFFER ZONE SPACING */
-    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; }
+    .buffer-box { margin: 100px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 40px 0; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -66,7 +67,6 @@ st.components.v1.html("""
 <script>
 const doc = window.parent.document;
 const trigger = (key) => {
-    // Bridges the Design to the Hidden Sidebar
     const btns = Array.from(doc.querySelectorAll('button'));
     const target = btns.find(el => el.innerText.includes(key));
     if (target) target.click();
@@ -80,7 +80,7 @@ doc.addEventListener('click', (e) => {
 </script>
 """, height=0)
 
-# --- 4. ZONE A & B: UI EXECUTION ---
+# --- 4. ZONE A & B: CORE WORK AREA ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 # STEP 1: SCAN
@@ -145,14 +145,13 @@ st.markdown('''
     </div>
 ''', unsafe_allow_html=True)
 
-# --- 5. ZONE C: THE BUFFER ZONE (FUTURE AFFILIATES/CONTACT) ---
+# --- 5. ZONE C: THE BUFFER ZONE (FUTURE AFFILIATES) ---
 st.markdown('<div class="buffer-box">', unsafe_allow_html=True)
-# This space is reserved for Marketing & Contact Portals
 st.write("&nbsp;") 
 st.write("&nbsp;")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 6. ZONE D: THE DATA FOUNDATION (INVENTORY LOG) ---
+# --- 6. ZONE D: INVENTORY LOG ---
 st.divider()
 st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Ready..."], "Platform": ["--"], "Date": ["--"]}))
 
