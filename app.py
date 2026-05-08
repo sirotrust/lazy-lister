@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import random
+import urllib.parse
 from datetime import datetime
 from google import genai
 from google.genai import types
@@ -11,45 +11,32 @@ st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
 if 'app_state' not in st.session_state:
-    st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro", 'active_model': None}
+    st.session_state.app_state = {'analysis': "", 'listing_out': "", 'active_model': None}
 
 # Dynamic Discovery Handshake
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    
-    # Auto-Discovery Logic: Ask the server what it supports
     if st.session_state.app_state['active_model'] is None:
-        available_models = [m.name for m in client.models.list()]
-        # Priority filter: Look for Flash-1.5 or 2.0 specifically
-        target = next((m for m in available_models if "gemini-1.5-flash" in m), None)
-        if not target:
-            target = next((m for m in available_models if "flash" in m), "gemini-1.5-flash")
-        
-        # Clean the string (remove 'models/' prefix if library adds it twice)
+        # Discovery Audit: Find active models to prevent 404
+        models = [m.name for m in client.models.list()]
+        target = next((m for m in models if "flash" in m), "gemini-1.5-flash")
         st.session_state.app_state['active_model'] = target.replace("models/", "")
     
     LITE_MODEL = st.session_state.app_state['active_model']
 except Exception as e:
-    st.error(f"SYSTEM ADVISOR: Handshake Failed. Verify API Key in Secrets. {str(e)}")
+    st.error(f"SYSTEM ADVISOR: API Handshake Failed. {str(e)}")
 
-# --- 2. MASTERPIECE CSS (PROTECTIVE LAYER) ---
+# --- 2. MASTERPIECE CSS (ZONE A-D) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
-
-    /* ZONE 1-4: STEP DESIGN */
     [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {
         color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
-    }
-    [data-testid="stTable"] td, [data-testid="stTable"] th {
-        color: #0F172A !important; background-color: #F8FAFC !important; font-weight: 600 !important; border: 1px solid #E2E8F0 !important;
     }
     [data-testid="stTextArea"] textarea {
         background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important;
     }
-
-    /* ZONE 5: BRANDING & BUTTONS */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
@@ -64,12 +51,8 @@ st.markdown("""
     #posh-maroon { background-color: #8C1B2F !important; }
     #fb-blue { background-color: #1877F2 !important; }
     #cl-purple { background-color: #502189 !important; }
-
-    /* ZONE D: SIDEBAR HIDER (ENGINE ROOM) */
     [data-testid="stSidebar"] { display: none !important; }
-    
-    /* BUFFER ZONE SPACING */
-    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 20px 0;}
+    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -84,9 +67,9 @@ const trigger = (key) => {
 };
 doc.addEventListener('click', (e) => {
     if (e.target.id === 'fb-blue') trigger('GHOST_FB');
-    if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
+    if (e.target.id === 'ebay-blue-list') trigger('GHOST_EBAY');
     if (e.target.id === 'cl-purple') trigger('GHOST_CL');
-    if (e.target.id === 'posh-maroon') trigger('GHOST_POSH');
+    if (e.target.id === 'posh-maroon-list') trigger('GHOST_POSH');
 });
 </script>
 """, height=0)
@@ -111,6 +94,7 @@ else:
 # STEP 2: DESCRIBE
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", key="notes_input", height=100, placeholder="Brand, Size, Condition...", label_visibility="collapsed")
+encoded_notes = urllib.parse.quote(notes)
 
 # STEP 3: PRICE
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
@@ -124,24 +108,23 @@ if st.session_state.app_state['analysis']: st.info(st.session_state.app_state['a
 
 st.markdown(f'''
     <div class="flex-grid">
-        <a href="https://www.ebay.com/sch/i.html?_nkw={notes}" target="_blank" class="m-btn" id="ebay-blue">EBAY</a>
-        <a href="https://www.amazon.com/s?k={notes}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
-        <a href="https://www.google.com/search?q={notes}" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
-        <a href="https://poshmark.com/search?query={notes}" target="_blank" class="m-btn" id="posh-maroon">POSH</a>
+        <a href="https://www.ebay.com/sch/i.html?_nkw={encoded_notes}&LH_Sold=1&LH_Complete=1" target="_blank" class="m-btn" id="ebay-blue">EBAY SOLD</a>
+        <a href="https://www.amazon.com/s?k={encoded_notes}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
+        <a href="https://www.google.com/search?q={encoded_notes}+price" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
+        <a href="https://poshmark.com/search?query={encoded_notes}" target="_blank" class="m-btn" id="posh-maroon">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
 
 # STEP 4: LIST
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
-st.session_state.app_state['style'] = style
+style_mode = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
 st.markdown(f'''
     <div class="flex-grid">
         <a href="#" class="m-btn" id="fb-blue">FB</a>
-        <a href="#" class="m-btn" id="ebay-blue">EBAY</a>
+        <a href="#" class="m-btn" id="ebay-blue-list">EBAY</a>
         <a href="#" class="m-btn" id="cl-purple">CL</a>
-        <a href="#" class="m-btn" id="posh-maroon">POSH</a>
+        <a href="#" class="m-btn" id="posh-maroon-list">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
 
@@ -156,10 +139,8 @@ st.markdown('''
     </div>
 ''', unsafe_allow_html=True)
 
-# --- 5. ZONE C: THE BUFFER ZONE (FUTURE MARKETING) ---
-st.markdown('<div class="buffer-box">', unsafe_allow_html=True)
-st.write("&nbsp;") 
-st.markdown('</div>', unsafe_allow_html=True)
+# --- 5. ZONE C: BUFFER ZONE ---
+st.markdown('<div class="buffer-box">&nbsp;</div>', unsafe_allow_html=True)
 
 # --- 6. ZONE D: INVENTORY LOG ---
 st.divider()
@@ -167,13 +148,14 @@ st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory 
 
 # --- 7. THE ENGINE ROOM (INVISIBLE SIDEBAR) ---
 with st.sidebar:
-    def run_ghost(p):
-        with st.spinner(f"Writing {p}..."):
-            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {st.session_state.app_state['style']} {p} listing: {notes}"])
+    def run_token_safe_ghost(platform):
+        with st.spinner(f"AI Writing {platform} {style_mode} Listing..."):
+            prompt = f"Write a {style_mode} {platform} listing based on these notes: {notes}"
+            res = client.models.generate_content(model=LITE_MODEL, contents=[prompt])
             st.session_state.app_state['listing_out'] = res.text
-            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
+            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": platform})
 
-    if st.button("GHOST_FB"): run_ghost("Facebook")
-    if st.button("GHOST_EBAY"): run_ghost("eBay")
-    if st.button("GHOST_CL"): run_ghost("Craigslist")
-    if st.button("GHOST_POSH"): run_ghost("Poshmark")
+    if st.button("GHOST_FB"): run_token_safe_ghost("Facebook")
+    if st.button("GHOST_EBAY"): run_token_safe_ghost("eBay")
+    if st.button("GHOST_CL"): run_token_safe_ghost("Craigslist")
+    if st.button("GHOST_POSH"): run_token_safe_ghost("Poshmark")
