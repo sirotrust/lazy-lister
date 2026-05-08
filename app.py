@@ -5,21 +5,22 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. THE ARCHITECTURAL ENGINE (ARCH1.PY BLUEPRINT) ---
+# --- 1. THE BRAIN & STATE ANCHOR ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
-if 'listing_out' not in st.session_state:
-    st.session_state.listing_out = ""
+if 'app_state' not in st.session_state:
+    st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro"}
 
-# Google Client Handshake (Flash-Lite Engine)
+# Google Client Handshake
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
     LITE_MODEL = "gemini-2.0-flash-lite-preview"
 except Exception:
-    st.error("LEAD DEV: API Handshake Failed. Check secrets.toml.")
+    st.error("LEAD DEV: API Handshake Failed.")
 
+# --- 2. THE MASTERPIECE CSS (RESTORED 1-FOR-1) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -58,26 +59,26 @@ st.markdown("""
     #posh-maroon { background-color: #8C1B2F !important; }
     #fb-blue { background-color: #1877F2 !important; }
     #cl-purple { background-color: #502189 !important; }
-
+    
     /* GHOST TRIGGER STYLING (HIDDEN AT BOTTOM) */
-    div.stButton > button {
-        position: fixed; bottom: -50px; left: 0; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none;
+    div.stButton > button[kind="secondary"] {
+        position: fixed; bottom: -100px; left: 0; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. THE JAVASCRIPT BRIDGE ---
+# --- 3. THE JAVASCRIPT BRIDGE ---
 st.components.v1.html("""
 <script>
 const doc = window.parent.document;
 const trigger = (key) => {
     const btns = Array.from(doc.querySelectorAll('button'));
-    const target = btns.find(el => el.innerText === key);
+    const target = btns.find(el => el.innerText.includes(key));
     if (target) target.click();
 };
 
 doc.addEventListener('click', (e) => {
-    // Intercept clicks on original HTML IDs to fire Python logic
+    // Intercept clicks on original HTML IDs to fire Ghost Triggers
     if (e.target.id === 'fb-blue') trigger('GHOST_FB');
     if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
     if (e.target.id === 'cl-purple') trigger('GHOST_CL');
@@ -86,23 +87,40 @@ doc.addEventListener('click', (e) => {
 </script>
 """, height=0)
 
-# --- 3. UI EXECUTION ---
+# --- 4. UI EXECUTION (RESTORED MASTERPIECE) ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
+# STEP 1: SCAN (Battery Release Logic)
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
-img_file = st.camera_input("Scanner", label_visibility="collapsed")
+if 'hero_shot' not in st.session_state:
+    img_file = st.camera_input("Scanner", label_visibility="collapsed")
+    if img_file:
+        st.session_state.hero_shot = img_file.getvalue()
+        st.session_state.img_type = img_file.type
+        st.rerun()
+else:
+    # Camera is now released; show preview only
+    st.image(st.session_state.hero_shot, use_container_width=True)
+    if st.button("📸 RETAKE PHOTO", use_container_width=True):
+        del st.session_state.hero_shot
+        st.rerun()
 
+# STEP 2: DESCRIBE
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", key="notes_input", height=100, placeholder="Brand, Size, Condition...", label_visibility="collapsed")
 
-# RESTORED STEP 3 BUTTON
+# STEP 3: PRICE
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
-    if img_file:
+    if 'hero_shot' in st.session_state:
         with st.spinner("Brain Processing..."):
-            part = types.Part.from_bytes(data=img_file.getvalue(), mime_type=img_file.type)
+            # Data Transformer for Google API
+            part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             response = client.models.generate_content(model=LITE_MODEL, contents=[notes, part])
-            st.info(response.text)
+            st.session_state.app_state['analysis'] = response.text
+
+if st.session_state.app_state['analysis']:
+    st.info(st.session_state.app_state['analysis'])
 
 st.markdown(f'''
     <div class="flex-grid">
@@ -113,10 +131,11 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
+# STEP 4: LIST
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
+style_choice = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
+st.session_state.app_state['style'] = style_choice
 
-# ORIGINAL HTML GRID
 st.markdown(f'''
     <div class="flex-grid">
         <a href="#" class="m-btn" id="fb-blue">FB</a>
@@ -126,20 +145,21 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-st.text_area("Output", value=st.session_state.listing_out, height=150, label_visibility="collapsed")
+st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# --- 4. THE GHOST TRIGGERS (HIDDEN AT BOTTOM) ---
+# --- 5. THE GHOST TRIGGERS (REMOTE) ---
 def run_ghost(p):
     with st.spinner(f"Writing {p} Listing..."):
-        res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {p} listing: {notes}"])
-        st.session_state.listing_out = res.text
+        prompt = f"Write a {st.session_state.app_state['style']} {p} listing based on these notes: {notes}"
+        res = client.models.generate_content(model=LITE_MODEL, contents=[prompt])
+        st.session_state.app_state['listing_out'] = res.text
         st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
 
-if st.button("GHOST_FB"): run_ghost("Facebook")
-if st.button("GHOST_EBAY"): run_ghost("eBay")
-if st.button("GHOST_CL"): run_ghost("Craigslist")
-if st.button("GHOST_POSH"): run_ghost("Poshmark")
+if st.button("GHOST_FB", type="secondary"): run_ghost("Facebook")
+if st.button("GHOST_EBAY", type="secondary"): run_ghost("eBay")
+if st.button("GHOST_CL", type="secondary"): run_ghost("Craigslist")
+if st.button("GHOST_POSH", type="secondary"): run_ghost("Poshmark")
 
 # INVENTORY LOG
 st.divider()
-st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Scanning Log..."], "Platform": ["--"], "Date": ["--"]}))
+st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Empty..."], "Platform": ["--"], "Date": ["--"]}))
