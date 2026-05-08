@@ -203,13 +203,19 @@ if 'action_trigger' in st.session_state.app_state:
     ctx = st.session_state.app_state['master_id']
     if ctx:
         with st.spinner(f"Writing {plat} Listing..."):
-            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-            style = st.session_state.get("style_radio", "Simple")
-            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing for: {ctx}"])
-            st.session_state.app_state['listing_out'] = res.text
-            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": plat})
-            st.session_state.app_state['tip_idx'] += 1
-            st.rerun()
+            try:
+                client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+                style = st.session_state.get("style_radio", "Simple")
+                res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing for: {ctx}"])
+                st.session_state.app_state['listing_out'] = res.text
+                st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": plat})
+                st.session_state.app_state['tip_idx'] += 1
+                st.rerun()
+            except Exception as e:
+                if "429" in str(e) or "exhausted" in str(e).lower():
+                    st.warning("⏳ **SPEED LIMIT HIT:** You are testing too fast! The AI needs a breather. Wait 60 seconds and click the button again.")
+                else:
+                    st.error(f"⚠️ ENGINE FAILURE: {str(e)}")
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
