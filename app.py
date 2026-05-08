@@ -13,7 +13,7 @@ TIP_LIBRARY = {
     "1": ["Wipe your camera lens before every scan to remove pocket lint and blur.", "Natural daylight is the best free studio lighting; avoid direct sun glare.", "Use a plain white or light gray backdrop to help AI isolate the item.", "Capture the 'Money Shot' first—the angle that best shows the item's value.", "For clothing, use a 'Ghost Mannequin' effect by filling it with padding.", "Take close-ups of brand tags and serial numbers for authenticity.", "Photograph every flaw; transparency builds buyer trust and prevents returns.", "Ensure the item fills 80% of the frame to maximize thumbnail visibility.", "Use a micro-fiber cloth to buff out smudges on electronics before scanning.", "For shoes, include a shot of the tread to show exact wear patterns."],
     "2": ["Mention 'Smoke-Free' or 'Pet-Free' homes; these are top buyer searches.", "If a logo is faded, describe the texture or material (e.g., 'Pebbled Leather').", "Include the 'MSRP' in your notes if the item is a known luxury piece.", "Note the 'Fit'—is it true to size, oversized, or runs small?", "Identify the 'Seasonality'—is this a 'Summer Essential' or 'Winter Ready'?", "List specific technology names (e.g., 'Gore-Tex' or 'Dri-FIT') for SEO.", "Describe flaws as 'Character' or 'Patina' for vintage items to stay positive.", "Mention if batteries or accessories are included to justify higher prices.", "Use the word 'Authentic' only if you have verified the serial number.", "If the brand is unknown, focus on the style trend (e.g., 'Boho' or 'Y2K')."],
     "3": ["Sort eBay by 'Sold Items' only; 'Listed Price' is often wishful thinking.", "Check Google Shopping to see what major retailers are charging for 'New'.", "On Poshmark, look at recently sold 'Comps' to gauge current platform heat.", "Price 10% higher than your goal to leave room for 'Best Offer' negotiations.", "End your price in '.99' or '.95' for psychological 'Value' perception.", "If supply is low but demand is high, don't be afraid to set a 'Premium' price.", "Monitor 'Watchers'—if you have many but no sales, drop price by 5%.", "Consider 'Free Shipping' but bake the shipping cost into the item price.", "Analyze the 'Age' of comps; sales from 6 months ago may be outdated.", "During holidays, prices can sustain a 15-20% markup on giftable items."],
-    "4": ["The first 80 characters of your title are the most important for SEO.", "Use 'Expert' style for high-ticket items to sound like a boutique.", "Include 'NWT' (New With Tags) at the start of titles if applicable.", "Add emojis to Facebook Marketplace titles to catch the scroller's eye.", "Mention 'Fast Shipping' in the description to encourage immediate buys.", "Use bullet points for features; buyers scan descriptions rather than reading.", "Cross-post to at least 3 platforms to triple your chances of a 24hr sale.", "List items on Sunday evenings; this is peak traffic time for most apps.", "Keep descriptions concise but thorough to reduce 'Is this available' DMs.", "Refresh your listings every 30 days to stay at the top of search results."],
+    "4": ["The first 80 characters of your title are the most important for SEO.", "Use 'Expert' style for high-ticket items to sound like a boutique.", "Include 'NWT' (New With Tags) at the start of titles if applicable.", "Add emojis to Facebook Marketplace titles to catch the scroller' eye.", "Mention 'Fast Shipping' in the description to encourage immediate buys.", "Use bullet points for features; buyers scan descriptions rather than reading.", "Cross-post to at least 3 platforms to triple your chances of a 24hr sale.", "List items on Sunday evenings; this is peak traffic time for most apps.", "Keep descriptions concise but thorough to reduce 'Is this available' DMs.", "Refresh your listings every 30 days to stay at the top of search results."],
     "5": ["Reuse clean Amazon boxes to save on supply costs and reduce waste.", "Invest in a thermal label printer to save hundreds on ink annually.", "Double-wrap fragile items in bubble wrap AND brown packing paper.", "Use 'Poly Mailers' for clothing to reduce weight and shipping costs.", "Always weigh your item WITH the box to avoid 'Postage Due' errors.", "Keep a 'Thank You' note template to encourage 5-star buyer reviews.", "Use 'Fragile' tape on the outside of boxes to alert postal handlers.", "For high-value items, use 'Signature Confirmation' for legal protection.", "Store poly mailers in sizes Small, Medium, and Large for quick packing.", "Use recycled paper shredding as a sustainable alternative to packing peanuts."],
     "6": ["Assign each item a 'Bin Number' to find sold items in under 60 seconds.", "Track your 'Cost of Goods Sold' (COGS) to see your actual net profit.", "Log the 'Date Listed' to identify 'Stale' inventory that needs a price cut.", "Quarterly inventory audits prevent 'Lost Item' cancellations.", "Keep photos on a cloud drive even after listing for backup.", "Group similar items in bins to make batch shipping faster.", "Use a simple 'SKU' system (e.g., SH-001 for Shirt #1) for tracking.", "Note the original platform listed on to avoid 'Double Selling'.", "Calculate your 'Sell-Through Rate' to see which brands flip the fastest.", "Keep your inventory off the floor to prevent moisture or dust damage."]
 }
@@ -66,9 +66,9 @@ st.markdown(f"""
     [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{ color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important; }}
 
     /* TOP NAV MANUAL */
-    .instruction-container {{ margin: 5px 0 25px 0; max-width: 950px; }}
+    .instruction-container {{ margin: 5px 0 25px 0; max-width: 950px; font-family: 'Courier New', Courier, monospace; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
-    .instruction-text {{ font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }}
+    .instruction-text {{ font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: pre; }}
 
     /* STEP LABELS */
     .step-label {{ font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; display: block; width: 100%; background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.0; letter-spacing: -0.5px; }}
@@ -102,12 +102,12 @@ st.markdown('<div style="margin-top:5px;"><span class="brand-word">LAZY 🦥 LIS
 
 st.markdown(f"""
 <div class="instruction-container">
-    <div class="instruction-row"><div class="instruction-text">1. Scan — Take a photo</div></div>
-    <div class="instruction-row"><div class="instruction-text">2. Analyze — Search online with Ai</div></div>
-    <div class="instruction-row"><div class="instruction-text">3. Price — Compare market value</div></div>
-    <div class="instruction-row"><div class="instruction-text">4. List — Generate listing with Ai</div></div>
-    <div class="instruction-row"><div class="instruction-text">5. Supplies — Purchase shipping supplies</div></div>
-    <div class="instruction-row"><div class="instruction-text">6. Inventory — Create and share your items</div></div>
+    <div class="instruction-row"><div class="instruction-text">1. Scan         -    Take a photo</div></div>
+    <div class="instruction-row"><div class="instruction-text">2. Analyze      -    Search online with Ai</div></div>
+    <div class="instruction-row"><div class="instruction-text">3. Price        -    Compare market value</div></div>
+    <div class="instruction-row"><div class="instruction-text">4. List         -    Generate listing with Ai</div></div>
+    <div class="instruction-row"><div class="instruction-text">5. Supplies     -    Purchase shipping supplies</div></div>
+    <div class="instruction-row"><div class="instruction-text">6. Inventory    -    Create and share your items</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -285,9 +285,3 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 with st.sidebar:
     st.markdown("### 💎 COMMERCIAL SUITE")
     st.session_state.app_state['is_pro'] = st.toggle("Simulate Pro Subscription", value=st.session_state.app_state['is_pro'])
-
-# --- SNIPPET: QUICK REFERENCE ---
-# DESIGN SYSTEM: Slate (#0F172A), Cyan (#22D3EE), Burgundy (#8C1B2F)
-# API PROMPT: Surgical Brand Scan - "Discard backgrounds. Identify exact BRAND and MODEL."
-# CLIPPING: document.execCommand('copy') used to bypass Streamlit state-reset.
-# -------------------------------
