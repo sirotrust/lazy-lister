@@ -159,7 +159,7 @@ else:
 st.markdown('<div class="step-label step-even">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
-if st.button("AI IDENTIFY", use_container_width=True):
+if st.button("ANALYZE", use_container_width=True):
     if 'hero_shot' in st.session_state:
         with st.spinner("Analyzing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
