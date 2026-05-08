@@ -86,17 +86,14 @@ st.markdown(f"""
         line-height: 1.0; letter-spacing: -1px; border-bottom: 4px solid #F8FAFC;
     }}
 
-    /* PLATFORM BUTTONS (NO UNDERLINE LOCK) */
+    /* PLATFORM BUTTONS (NO UNDERLINE) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-        text-decoration: none !important; /* Underline Purge */
+        text-decoration: none !important;
         color: #FFFFFF !important; font-weight: 950; font-size: 14px; text-transform: uppercase; border: none;
     }}
-    .m-btn:hover, .m-btn:active, .m-btn:visited {{
-        text-decoration: none !important;
-        color: #FFFFFF !important;
-    }}
+    .m-btn:hover, .m-btn:active {{ text-decoration: none !important; color: #FFFFFF !important; }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
     #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
@@ -152,13 +149,18 @@ notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws..
 
 if st.button("ANALYZE", use_container_width=True):
     if 'hero_shot' in st.session_state:
-        with st.spinner("Analyzing..."):
+        with st.spinner("Analyzing Foregrounds..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
+            
+            # REFINED PROMPT FOR ISOLATION
+            isolation_prompt = f"Identify only the SINGLE primary item in the foreground. Ignore backgrounds, hands, tables, or furniture it is sitting on. Combine with notes: {notes}. Provide a clean 5-word professional title."
+            
+            res = client.models.generate_content(model=LITE_MODEL, contents=[isolation_prompt, part])
             st.session_state.app_state['master_id'] = res.text
+            
             # Step 5 Pre-load
-            sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 packing items for: {res.text}"])
+            sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 specific packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
