@@ -5,7 +5,7 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. THE ARCHITECTURAL ENGINE (ARCH1.PY BLUEPRINT) ---
+# --- 1. THE ARCHITECTURAL ENGINE (RESTORATION FROM ARCH1.PY) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 if 'inventory' not in st.session_state:
@@ -16,11 +16,11 @@ if 'listing_out' not in st.session_state:
 # Google Client Handshake (Flash-Lite Engine)
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    LITE_MODEL = "gemini-2.0-flash-lite-preview-02-05"
+    # CORRECTED MODEL STRING FOR API COMPATIBILITY
+    LITE_MODEL = "gemini-2.0-flash-lite-preview"
 except Exception:
     st.error("LEAD DEV: API Handshake Failed. Check secrets.toml.")
 
-# ORIGINAL CSS (ZONE 1-6)
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -59,30 +59,24 @@ st.markdown("""
     #posh-maroon { background-color: #8C1B2F !important; }
     #fb-blue { background-color: #1877F2 !important; }
     #cl-purple { background-color: #502189 !important; }
-    
-    /* ZONE 6: BOXES */
-    .suggestion-box, .reminder-box { padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid; }
-    .suggestion-box { background-color: #F0F9FF !important; border-left: 6px solid #0EA5E9 !important; border-color: #E0F2FE; }
-    .reminder-box { background-color: #FFFBEB !important; border-left: 6px solid #F59E0B !important; border-color: #FEF3C7; }
-    
+
     /* GHOST TRIGGER STYLING (HIDDEN AT BOTTOM) */
-    div.stButton > button[kind="secondary"] {
+    div.stButton > button {
         position: fixed; bottom: -50px; left: 0; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. THE JAVASCRIPT BRIDGE (ZERO DESIGN CHANGE) ---
+# --- 2. THE JAVASCRIPT BRIDGE ---
 st.components.v1.html("""
 <script>
 const doc = window.parent.document;
 const trigger = (key) => {
     const btns = Array.from(doc.querySelectorAll('button'));
-    const target = btns.find(el => el.innerText.includes(key));
+    const target = btns.find(el => el.innerText === key);
     if (target) target.click();
 };
 
-// Map original HTML IDs to Ghost Triggers
 doc.addEventListener('click', (e) => {
     if (e.target.id === 'fb-blue') trigger('GHOST_FB');
     if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
@@ -92,7 +86,7 @@ doc.addEventListener('click', (e) => {
 </script>
 """, height=0)
 
-# --- 3. UI EXECUTION (YOUR ORIGINAL DESIGN) ---
+# --- 3. UI EXECUTION ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
@@ -121,7 +115,6 @@ st.markdown(f'''
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
 style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
-# YOUR ORIGINAL HTML STEP 4 BUTTONS
 st.markdown(f'''
     <div class="flex-grid">
         <a href="#" class="m-btn" id="fb-blue">FB</a>
@@ -140,10 +133,10 @@ def run_ghost(p):
         st.session_state.listing_out = res.text
         st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
 
-if st.button("GHOST_FB", type="secondary"): run_ghost("Facebook")
-if st.button("GHOST_EBAY", type="secondary"): run_ghost("eBay")
-if st.button("GHOST_CL", type="secondary"): run_ghost("Craigslist")
-if st.button("GHOST_POSH", type="secondary"): run_ghost("Poshmark")
+if st.button("GHOST_FB"): run_ghost("Facebook")
+if st.button("GHOST_EBAY"): run_ghost("eBay")
+if st.button("GHOST_CL"): run_ghost("Craigslist")
+if st.button("GHOST_POSH"): run_ghost("Poshmark")
 
 # INVENTORY LOG
 st.divider()
