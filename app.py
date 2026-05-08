@@ -58,10 +58,19 @@ st.markdown("""
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     
-    /* STREAMLINED INSTRUCTIONS */
-    .instruction-container { margin: 30px 0; border-left: 2px solid #0F172A; padding-left: 20px; }
-    .instruction-item { color: #0F172A; font-size: 14px; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-    .instruction-item b { font-weight: 900; color: #0F172A; margin-right: 10px; }
+    /* MODERN STREAMLINED INSTRUCTIONS */
+    .instruction-container { margin: 25px 0; border-left: 2px solid #E2E8F0; padding-left: 15px; }
+    .modern-instruction-item { 
+        font-size: 12px; 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin-bottom: 4px;
+        background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: block;
+    }
 
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
 
@@ -85,17 +94,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & STREAMLINED INSTRUCTIONS ---
-st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
+# --- 3. THE HEADER & MODERN INSTRUCTIONS ---
+st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="instruction-container">
-    <div class="instruction-item"><b>01 SCAN</b> — CAPTURE A HIGH-RESOLUTION PRODUCT IMAGE</div>
-    <div class="instruction-item"><b>02 IDENTIFY</b> — ACTIVATE AI TO EXTRACT BRAND & CONDITION DATA</div>
-    <div class="instruction-item"><b>03 PRICE</b> — ANALYZE REAL-TIME MARKET COMPS & PRICING</div>
-    <div class="instruction-item"><b>04 LIST</b> — GENERATE PROFESSIONAL LISTING COPY INSTANTLY</div>
-    <div class="instruction-item"><b>05 SUPPLY</b> — ACQUIRE SPECIALIZED PACKING MATERIALS</div>
-    <div class="instruction-item"><b>06 VAULT</b> — SECURELY ARCHIVE ENTRY INTO INVENTORY</div>
+    <span class="modern-instruction-item">1 SCAN — Capture high-resolution product image</span>
+    <span class="modern-instruction-item">2 IDENTIFY — Activate AI to extract brand and condition data</span>
+    <span class="modern-instruction-item">3 PRICE — Analyze real-time market comps and pricing</span>
+    <span class="modern-instruction-item">4 LIST — Generate professional listing copy instantly</span>
+    <span class="modern-instruction-item">5 SUPPLY — Acquire specialized packing materials</span>
+    <span class="modern-instruction-item">6 VAULT — Archive entry into secure inventory</span>
 </div>
 """, unsafe_allow_html=True)
 
