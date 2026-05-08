@@ -114,6 +114,10 @@ st.markdown(f"""
 # --- STEP 1: SCAN ---
 st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Take a photo of your item</div>', unsafe_allow_html=True)
+
+# Pro Tip moved above camera input
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
+
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -122,8 +126,6 @@ if 'hero_shot' not in st.session_state:
         st.rerun()
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
-    st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
-    
     with stylable_container("add_btn", css_styles="""button {background: #0F172A !important; border: none !important;}"""):
         if st.button("ADD ITEM", use_container_width=True):
             st.session_state.app_state['tip_idx'] += 1
@@ -137,7 +139,6 @@ else:
 # --- STEP 2: ANALYZE ---
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
 with stylable_container("analyze_btn", css_styles="""button {background: #0F172A !important; border: none !important;}"""):
     if st.button("ANALYZE", use_container_width=True):
@@ -154,6 +155,9 @@ with stylable_container("analyze_btn", css_styles="""button {background: #0F172A
                 sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Name 2 specific packing supplies for {res.text}. Maximum 10 words total. Be extremely brief."])
                 st.session_state.app_state['supply_tips'] = sup_res.text
                 st.rerun()
+
+# Pro Tip moved between Analyze Button and Text Area
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
 notes = st.text_area("Notes", height=100, placeholder="Describe your item details...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
@@ -176,100 +180,4 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
-
-c1, c2, c3 = st.columns(3)
-with c1:
-    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; border: none !important;}"""):
-        if st.button("FACEBOOK", use_container_width=True):
-            st.session_state.app_state['action_trigger'] = "FACEBOOK"
-with c2:
-    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; border: none !important;}"""):
-        if st.button("EBAY", use_container_width=True):
-            st.session_state.app_state['action_trigger'] = "EBAY"
-with c3:
-    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; border: none !important;}"""):
-        if st.button("POSHMARK", use_container_width=True):
-            st.session_state.app_state['action_trigger'] = "POSHMARK"
-
-if 'action_trigger' in st.session_state.app_state:
-    plat = st.session_state.app_state.pop('action_trigger')
-    ctx = st.session_state.app_state['master_id']
-    if ctx:
-        with st.spinner(f"Writing {plat} Listing..."):
-            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-            style = st.session_state.get("style_radio", "Simple")
-            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing for: {ctx}"])
-            st.session_state.app_state['listing_out'] = res.text
-            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": plat})
-            st.session_state.app_state['tip_idx'] += 1
-            st.rerun()
-
-st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
-
-# THE CLIPBOARD FIX: Bypasses manual selection via isolated JavaScript execCommand
-if st.session_state.app_state['listing_out']:
-    safe_text = json.dumps(st.session_state.app_state['listing_out'])
-    copy_html = f"""
-    <script>
-    function copyToClipboard() {{
-        const el = document.createElement('textarea');
-        el.value = {safe_text};
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        const btn = document.getElementById('copybtn');
-        btn.innerHTML = '✅ COPIED TO CLIPBOARD';
-        btn.style.background = '#0F172A';
-        setTimeout(() => {{
-            btn.innerHTML = '📋 COPY TO CLIPBOARD';
-            btn.style.background = '#0ea5e9';
-        }}, 2000);
-    }}
-    </script>
-    <button id="copybtn" onclick="copyToClipboard()" style="width: 100%; height: 60px; background: #0ea5e9; color: white; border-radius: 12px; border: none; font-weight: 950; font-size: 16px; text-transform: uppercase; font-family: sans-serif; cursor: pointer; transition: 0.3s; margin-top: 5px;">
-    📋 COPY TO CLIPBOARD
-    </button>
-    """
-    components.html(copy_html, height=80)
-
-# --- STEP 5: SUPPLIES ---
-st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
-
-supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
-st.markdown(f'''
-    <div style="display: flex; gap: 8px; margin: 15px 0; width: 100%;">
-        <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 16px; background: #483332;">AMAZON</a>
-        <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 16px; background: #CC0000;">GOOGLE</a>
-    </div>
-''', unsafe_allow_html=True)
-
-if st.session_state.app_state['supply_tips']: 
-    st.success(f"📦 Ai tips: {st.session_state.app_state['supply_tips']}")
-
-# --- STEP 6: INVENTORY ---
-st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Create and share your items</div>', unsafe_allow_html=True)
-
-if st.session_state.app_state['is_pro']:
-    with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
-        with st.form("manual"):
-            m_item = st.text_input("Item Name")
-            m_plat = st.selectbox("Platform", ["eBay", "Facebook", "Poshmark"])
-            if st.form_submit_button("Log Item"):
-                st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": m_item, "Platform": m_plat})
-                st.rerun()
-else:
-    st.warning("🔒 Manual Entry & Batching are reserved for Pro Subscribers.")
-
-if st.session_state.inventory:
-    st.table(pd.DataFrame(st.session_state.inventory))
-
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: SCALE</div><div class="pro-tip-content">"{get_pro_tip(6)}"</div></div>""", unsafe_allow_html=True)
-
-with st.sidebar:
-    st.markdown("### 💎 COMMERCIAL SUITE")
-    st.session_state.app_state['is_pro'] = st.toggle("Simulate Pro Subscription", value=st.session_state.app_state['is_pro'])
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div>
