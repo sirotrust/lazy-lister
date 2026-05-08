@@ -54,11 +54,15 @@ st.markdown("""
         background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important;
     }
 
-    /* BRANDING & INSTRUCTIONS */
+    /* BRANDING & HEADER */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
-    .app-instructions { color: #0F172A; font-weight: 600; font-size: 15px; margin: 20px 0; line-height: 1.6; max-width: 800px; }
     
+    /* STREAMLINED INSTRUCTIONS */
+    .instruction-container { margin: 30px 0; border-left: 2px solid #0F172A; padding-left: 20px; }
+    .instruction-item { color: #0F172A; font-size: 14px; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .instruction-item b { font-weight: 900; color: #0F172A; margin-right: 10px; }
+
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
 
     /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
@@ -68,14 +72,12 @@ st.markdown("""
         text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }
     
-    /* COLORS */
     #fb-cyan { background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }
     #ebay-midnight { background: linear-gradient(45deg, #002F6C, #0F172A) !important; }
     #posh-velvet { background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; }
     #google-red { background-color: #CC0000 !important; }
     #amz-brown { background-color: #483332 !important; }
     
-    /* NATIVE BUTTON OVERRIDE */
     .stButton button {
         height: 60px !important; border-radius: 12px !important; font-weight: 950 !important;
         background: #0F172A !important; color: white !important; border: none !important;
@@ -83,16 +85,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & INSTRUCTIONS ---
+# --- 3. THE HEADER & STREAMLINED INSTRUCTIONS ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
-<div class="app-instructions">
-    Lazy Lister streamlines your reselling workflow into a six-step commercial engine. 
-    First, capture a high-quality scan of your product. Second, use the AI Identification to analyze 
-    brand details, condition, and key attributes. Third, check real-time market prices across major 
-    platforms. Fourth, generate professionally styled listing copy instantly. Fifth, find the exact 
-    shipping supplies required to protect your item. Finally, log the entry into your secure inventory vault.
+<div class="instruction-container">
+    <div class="instruction-item"><b>01 SCAN</b> — CAPTURE A HIGH-RESOLUTION PRODUCT IMAGE</div>
+    <div class="instruction-item"><b>02 IDENTIFY</b> — ACTIVATE AI TO EXTRACT BRAND & CONDITION DATA</div>
+    <div class="instruction-item"><b>03 PRICE</b> — ANALYZE REAL-TIME MARKET COMPS & PRICING</div>
+    <div class="instruction-item"><b>04 LIST</b> — GENERATE PROFESSIONAL LISTING COPY INSTANTLY</div>
+    <div class="instruction-item"><b>05 SUPPLY</b> — ACQUIRE SPECIALIZED PACKING MATERIALS</div>
+    <div class="instruction-item"><b>06 VAULT</b> — SECURELY ARCHIVE ENTRY INTO INVENTORY</div>
 </div>
 """, unsafe_allow_html=True)
 
