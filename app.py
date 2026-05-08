@@ -32,25 +32,43 @@ def get_pro_tip(step_num):
     idx = st.session_state.app_state['tip_idx'] % 10
     return TIP_LIBRARY[str(step_num)][idx]
 
+# --- 2b. SILENT ACTION LISTENER (Prevents Reset) ---
+params = st.query_params
+if "action" in params:
+    action = params.get("action")
+    ctx = st.session_state.app_state['master_id']
+    if ctx:
+        try:
+            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+            style = st.session_state.get("style_radio", "Simple")
+            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {action} listing for: {ctx}"])
+            st.session_state.app_state['listing_out'] = res.text
+            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": action.upper()})
+            st.session_state.app_state['tip_idx'] += 1
+            st.query_params.clear()
+            st.rerun()
+        except: 
+            st.query_params.clear()
+
 # --- 3. UI ARCHITECTURE (CSS) ---
 st.markdown(f"""
     <style>
     header, footer, [data-testid="stHeader"] {{visibility: hidden; display: none;}}
     .stApp {{ background-color: #FFFFFF !important; }}
 
-    /* BRANDING (60px) */
+    /* BRANDING */
     .brand-word {{ color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 16px !important; }}
     
     /* RADIO BUTTON FIX */
     [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{ color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important; }}
 
-    /* TOP NAV MANUAL (12px) */
+    /* TOP NAV MANUAL */
     .instruction-container {{ margin: 5px 0 25px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }}
 
-    /* STEP LABELS (28px) */
+    /* STEP LABELS */
     .step-label {{ font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; display: block; width: 100%; background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.0; letter-spacing: -0.5px; }}
     .step-sub-label {{ font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; display: block; border-bottom: 2px solid #F1F5F9; padding-bottom: 5px; }}
 
@@ -59,13 +77,20 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* GLOBAL NATIVE OVERRIDES - Force White Text through Shadow DOM */
-    .stButton button, .stLinkButton a {{
+    /* GLOBAL NATIVE BUTTON OVERRIDES (Fixes The Blob) */
+    .stButton button {{
         height: 65px !important; border-radius: 14px !important; font-weight: 950 !important;
-        font-size: 20px !important; text-transform: uppercase !important; letter-spacing: 1px !important; width: 100%;
+        font-size: 18px !important; text-transform: uppercase !important; letter-spacing: 1px !important;
+        margin-bottom: 12px !important; /* Adds clear separation when stacked on mobile */
     }}
-    .stButton button *, .stLinkButton a * {{
+    .stButton button * {{
         color: #FFFFFF !important;
+    }}
+
+    /* WARNING BOX TEXT VISIBILITY FIX (Overcomes Phone Dark Mode) */
+    [data-testid="stNotification"] * {{
+        color: #0F172A !important;
+        font-weight: 800 !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -96,6 +121,7 @@ if 'hero_shot' not in st.session_state:
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
     st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
+    
     with stylable_container("add_btn", css_styles="""button {background: #0F172A !important; border: none !important;}"""):
         if st.button("ADD ITEM", use_container_width=True):
             st.session_state.app_state['tip_idx'] += 1
@@ -118,8 +144,7 @@ with stylable_container("analyze_btn", css_styles="""button {background: #0F172A
             with st.spinner("Surgical Brand Scan..."):
                 client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
                 part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-                # Surgical logic optimized for Amazon Remote models
-                surgical_prompt = f"Professional item identification. Discard backgrounds. Identify exact BRAND and MODEL (e.g. Amazon Fire TV Remote). Use notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
+                surgical_prompt = f"Professional item identification. Discard backgrounds. Identify exact BRAND and MODEL. Notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
                 res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
                 st.session_state.app_state['master_id'] = res.text
                 sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
@@ -178,19 +203,18 @@ if 'action_trigger' in st.session_state.app_state:
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# --- STEP 5: SUPPLIES ---
+# --- STEP 5: SUPPLIES (REVERTED TO FOOLPROOF HTML FLEXBOX) ---
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
-s1, s2 = st.columns(2)
-with s1:
-    with stylable_container("amazon_strict_lock", css_styles="""button, a {background: #483332 !important; border: none !important;}"""):
-        st.link_button("AMAZON", url=f"https://www.amazon.com/s?k={supply_q}", use_container_width=True)
-with s2:
-    with stylable_container("google_strict_lock", css_styles="""button, a {background: #CC0000 !important; border: none !important;}"""):
-        st.link_button("GOOGLE", url=f"https://www.google.com/search?q={supply_q}+shipping&tbm=shop", use_container_width=True)
+st.markdown(f'''
+    <div style="display: flex; gap: 8px; margin: 15px 0; width: 100%;">
+        <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 16px; background: #483332;">AMAZON</a>
+        <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 16px; background: #CC0000;">GOOGLE</a>
+    </div>
+''', unsafe_allow_html=True)
 
 if st.session_state.app_state['supply_tips']: 
     st.success(f"📦 Ai tips: {st.session_state.app_state['supply_tips']}")
