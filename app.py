@@ -86,22 +86,21 @@ st.markdown(f"""
         white-space: nowrap;
     }}
 
-    /* THE CALIBRATED STEP LABELS (36px) */
+    /* UNIFORM STEP LABELS (36px - LIGHT TO DARK) */
     .step-label {{ 
         font-weight: 950; 
-        font-size: 36px !important; /* Calibrated to prevent wrapping while maintaining scale */
+        font-size: 36px !important; 
         text-transform: uppercase; 
         margin-top: 35px; 
         display: block;
         width: 100%;
+        background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         line-height: 1.0;
         letter-spacing: -1px;
         border-bottom: 4px solid #F8FAFC;
     }}
-    .step-odd {{ background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }}
-    .step-even {{ background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }}
 
     /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
@@ -139,8 +138,8 @@ st.markdown("""
 
 # --- 4. THE 6-STEP FLOW ---
 
-# STEP 1: SCAN (ODD)
-st.markdown('<div class="step-label step-odd">STEP 1: SCAN</div>', unsafe_allow_html=True)
+# STEP 1: SCAN
+st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -155,11 +154,11 @@ else:
         st.session_state.app_state['listing_out'] = ""
         st.rerun()
 
-# STEP 2: ANALYZE (EVEN)
-st.markdown('<div class="step-label step-even">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
+# STEP 2: ANALYZE
+st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
-if st.button("ANALYZE", use_container_width=True):
+if st.button("AI IDENTIFY", use_container_width=True):
     if 'hero_shot' in st.session_state:
         with st.spinner("Analyzing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
@@ -170,8 +169,8 @@ if st.button("ANALYZE", use_container_width=True):
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
-# STEP 3: PRICE (ODD)
-st.markdown('<div class="step-label step-odd">STEP 3: PRICE</div>', unsafe_allow_html=True)
+# STEP 3: PRICE
+st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -183,8 +182,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4: LIST (EVEN)
-st.markdown('<div class="step-label step-even">STEP 4: LIST</div>', unsafe_allow_html=True)
+# STEP 4: LIST
+st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -202,8 +201,8 @@ if st.session_state.app_state['is_pro']:
 else:
     st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
 
-# STEP 5: SUPPLIES (ODD)
-st.markdown('<div class="step-label step-odd">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
+# STEP 5: SUPPLIES
+st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -214,8 +213,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 6: INVENTORY (EVEN)
-st.markdown('<div class="step-label step-even">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
+# STEP 6: INVENTORY
+st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
         with st.form("manual"):
