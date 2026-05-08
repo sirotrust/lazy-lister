@@ -41,32 +41,32 @@ if "action" in params:
         st.query_params.clear()
 
 # --- 2. THE WHITE MASTERPIECE UI (CSS) ---
-st.markdown("""
+st.markdown(f"""
     <style>
-    header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
-    .stApp { background-color: #FFFFFF !important; }
+    header, footer, [data-testid="stHeader"] {{visibility: hidden; display: none;}}
+    .stApp {{ background-color: #FFFFFF !important; }}
 
     /* UI VISIBILITY LOCK */
-    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {
+    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {{
         color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
-    }
-    [data-testid="stTextArea"] textarea {
+    }}
+    [data-testid="stTextArea"] textarea {{
         background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important;
-    }
+    }}
 
     /* BRANDING & HEADER */
-    .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
-    .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 18px !important; }
+    .brand-word {{ color: #0F172A; font-size: 70px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
+    .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 18px !important; }}
     
     /* MICRO-INSTRUCTIONS (10px) */
-    .instruction-container { margin: 20px 0 30px 0; max-width: 900px; }
-    .instruction-row { 
+    .instruction-container {{ margin: 20px 0 30px 0; max-width: 900px; }}
+    .instruction-row {{ 
         display: flex; 
         align-items: center; 
         margin-bottom: 2px;
         gap: 6px;
-    }
-    .instruction-num {
+    }}
+    .instruction-num {{
         font-size: 10px;
         font-weight: 950;
         min-width: 12px;
@@ -74,8 +74,8 @@ st.markdown("""
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-    }
-    .instruction-text { 
+    }}
+    .instruction-text {{ 
         font-size: 10px; 
         font-weight: 950; 
         text-transform: uppercase; 
@@ -84,42 +84,42 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         white-space: nowrap;
-    }
+    }}
 
-    /* THE MAX-SCALE STEP LABELS (58px) */
-    .step-label { 
+    /* THE CALIBRATED STEP LABELS (52px) */
+    .step-label {{ 
         font-weight: 950; 
-        font-size: 58px !important; /* Absolute ceiling */
+        font-size: 52px !important; /* Calibrated to fit one line */
         text-transform: uppercase; 
         margin-top: 40px; 
-        display: block; /* Ensure it takes full width and doesn't shrink */
+        display: block;
         width: 100%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         line-height: 0.9;
         letter-spacing: -2px;
         border-bottom: 8px solid #F8FAFC;
-    }
-    .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
-    .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
+    }}
+    .step-odd {{ background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }}
+    .step-even {{ background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }}
 
     /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
-    .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }
-    .m-btn {
+    .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
+    .m-btn {{
         flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
-    }
+    }}
     
-    #fb-cyan { background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }
-    #ebay-midnight { background: linear-gradient(45deg, #002F6C, #0F172A) !important; }
-    #posh-velvet { background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; }
-    #google-red { background-color: #CC0000 !important; }
-    #amz-brown { background-color: #483332 !important; }
+    #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
+    #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
+    #posh-velvet {{ background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; }}
+    #google-red {{ background-color: #CC0000 !important; }}
+    #amz-brown {{ background-color: #483332 !important; }}
     
-    .stButton button {
+    .stButton button {{
         height: 65px !important; border-radius: 12px !important; font-weight: 950 !important;
         background: #0F172A !important; color: white !important; border: none !important;
-    }
+    }}
     </style>
 """, unsafe_allow_html=True)
 
