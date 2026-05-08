@@ -5,17 +5,23 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. ENGINE ROOM (STATE & RELAY) ---
+# --- 1. ENGINE ROOM (HARD-LOCK) ---
+# Hard-coded to Gemini 2.5 Flash-Lite for 1500+ RPD and $0.10/MTok pricing.
+LITE_MODEL = "gemini-2.5-flash-lite" 
+
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
+# Initialize Session State Keys (Forensic Audit Fix)
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
 if 'app_state' not in st.session_state:
     st.session_state.app_state = {
-        'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False
+        'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False, 'scan_count': 0
     }
+if 'notes_input' not in st.session_state:
+    st.session_state.notes_input = ""
 
-# Query Parameter Listener for Step 4 Execution (Stability Anchor)
+# --- 2. BACKEND TRIGGER (QUERY PARAMETER ANCHOR) ---
 params = st.query_params
 if "action" in params:
     action = params.get("action")
@@ -24,8 +30,9 @@ if "action" in params:
         try:
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             style_pref = st.session_state.get("style_radio", "Simple")
+            # Using the Hard-Locked Lite Model
             res = client.models.generate_content(
-                model="gemini-1.5-flash", 
+                model=LITE_MODEL, 
                 contents=[f"Write a {style_pref} {action} listing for: {ctx}"]
             )
             st.session_state.app_state['listing_out'] = res.text
@@ -40,7 +47,7 @@ if "action" in params:
     else:
         st.query_params.clear()
 
-# --- 2. THE WHITE MASTERPIECE UI (CSS) ---
+# --- 3. THE WHITE MASTERPIECE UI (CSS) ---
 st.markdown(f"""
     <style>
     header, footer, [data-testid="stHeader"] {{visibility: hidden; display: none;}}
@@ -54,11 +61,11 @@ st.markdown(f"""
         background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important;
     }}
 
-    /* BRANDING & HEADER */
+    /* BRANDING (70px) */
     .brand-word {{ color: #0F172A; font-size: 70px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 18px !important; }}
     
-    /* MICRO-INSTRUCTIONS (12px - ONE LINE ONLY) */
+    /* MICRO-INSTRUCTIONS (12px - ONE LINE) */
     .instruction-container {{ margin: 20px 0 30px 0; max-width: 950px; }}
     .instruction-row {{ 
         display: flex; 
@@ -67,42 +74,27 @@ st.markdown(f"""
         gap: 6px;
     }}
     .instruction-num {{
-        font-size: 12px;
-        font-weight: 950;
-        min-width: 14px;
-        flex-shrink: 0;
+        font-size: 12px; font-weight: 950; min-width: 14px; flex-shrink: 0;
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }}
     .instruction-text {{ 
-        font-size: 12px; 
-        font-weight: 950; 
-        text-transform: uppercase; 
-        letter-spacing: 0.5px; 
+        font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; 
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        white-space: nowrap; /* Enforce single line */
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        white-space: nowrap; 
     }}
 
-    /* UNIFORM STEP LABELS (36px - LIGHT TO DARK) */
+    /* STEP LABELS (36px - UNIFORM GRADIENT) */
     .step-label {{ 
-        font-weight: 950; 
-        font-size: 36px !important; 
-        text-transform: uppercase; 
-        margin-top: 35px; 
-        display: block;
-        width: 100%;
+        font-weight: 950; font-size: 36px !important; text-transform: uppercase; margin-top: 35px; 
+        display: block; width: 100%;
         background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        line-height: 1.0;
-        letter-spacing: -1px;
-        border-bottom: 4px solid #F8FAFC;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        line-height: 1.0; letter-spacing: -1px; border-bottom: 4px solid #F8FAFC;
     }}
 
-    /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
+    /* PLATFORM BUTTONS */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
@@ -122,7 +114,7 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & MICRO-INSTRUCTIONS ---
+# --- 4. APP LAYOUT ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
@@ -136,8 +128,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- 4. THE 6-STEP FLOW ---
-
 # STEP 1: SCAN
 st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
@@ -149,23 +139,27 @@ if 'hero_shot' not in st.session_state:
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
     if st.button("ADD ITEM", use_container_width=True):
-        del st.session_state.hero_shot
+        # Full Reset without Session State Key Collision
+        for key in ['hero_shot', 'img_type', 'notes_input']:
+            if key in st.session_state: del st.session_state[key]
         st.session_state.app_state['master_id'] = ""
         st.session_state.app_state['listing_out'] = ""
+        st.session_state.app_state['scan_count'] += 1 # Force widget reload
         st.rerun()
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
-notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
+notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
-if st.button("ANALYZE", use_container_width=True):
+if st.button("AI IDENTIFY", use_container_width=True):
     if 'hero_shot' in st.session_state:
         with st.spinner("Analyzing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-            res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
+            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
             st.session_state.app_state['master_id'] = res.text
-            sup_res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Suggest 2 packing items for: {res.text}"])
+            # Step 5 Pre-load
+            sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
@@ -196,11 +190,6 @@ st.markdown(f'''
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-if st.session_state.app_state['is_pro']:
-    if st.button("OMNI-SHARE TO DEVICE", use_container_width=True): pass
-else:
-    st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
-
 # STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
@@ -215,17 +204,6 @@ st.markdown(f'''
 
 # STEP 6: INVENTORY
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
-if st.session_state.app_state['is_pro']:
-    with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
-        with st.form("manual"):
-            m_item = st.text_input("Item Name")
-            m_plat = st.selectbox("Platform", ["eBay", "Facebook", "Poshmark"])
-            if st.form_submit_button("Log Item"):
-                st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": m_item, "Platform": m_plat})
-                st.rerun()
-else:
-    st.warning("🔒 Manual Entry & Batching are reserved for Pro Subscribers.")
-
 if st.session_state.inventory:
     st.table(pd.DataFrame(st.session_state.inventory))
 
