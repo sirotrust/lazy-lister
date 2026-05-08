@@ -5,10 +5,9 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. ENGINE ROOM (STATE & QUERY ANCHOR) ---
+# --- 1. ENGINE ROOM (STATE & RELAY) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
-# Persistent State
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
 if 'app_state' not in st.session_state:
@@ -16,19 +15,15 @@ if 'app_state' not in st.session_state:
         'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False
     }
 
-# --- 2. THE QUERY PARAMETER LISTENER (BACKEND TRIGGER) ---
+# Query Parameter Listener for Step 4 Execution
 params = st.query_params
 if "action" in params:
     action = params.get("action")
-    # Retrieve the anchor data
     ctx = st.session_state.app_state['master_id']
     if ctx:
         try:
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-            # Determine style from radio (default to Simple if not set)
             style_pref = st.session_state.get("style_radio", "Simple")
-            
-            # RUN AI ENGINE
             res = client.models.generate_content(
                 model="gemini-1.5-flash", 
                 contents=[f"Write a {style_pref} {action} listing for: {ctx}"]
@@ -39,15 +34,13 @@ if "action" in params:
                 "Item": ctx[:30], 
                 "Platform": action.upper()
             })
-            # Clear params to prevent reload loop
             st.query_params.clear()
         except Exception as e:
             st.error(f"ENGINE FAILURE: {str(e)}")
     else:
-        st.warning("Please run Step 2 Analysis first.")
         st.query_params.clear()
 
-# --- 3. THE WHITE MASTERPIECE UI (STRICT CSS) ---
+# --- 2. THE WHITE MASTERPIECE UI (CSS) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -61,20 +54,21 @@ st.markdown("""
         background-color: #F1F5F9 !important; color: #0F172A !important; font-weight: 600 !important; border: 2px solid #CBD5E1 !important;
     }
 
-    /* BRANDING & SEQUENTIAL FLOW */
+    /* BRANDING & INSTRUCTIONS */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+    .app-instructions { color: #0F172A; font-weight: 600; font-size: 15px; margin: 20px 0; line-height: 1.6; max-width: 800px; }
+    
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
-    .onboarding { color: #475569; font-weight: 600; font-size: 14px; margin: 15px 0; border-left: 4px solid #CBD5E1; padding-left: 10px; }
 
-    /* THE PRO-PALETTE BUTTONS (HTML ANCHORS) */
+    /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
     .m-btn {
         flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }
     
-    /* SPECIFIC COLORS (THE LAW) */
+    /* COLORS */
     #fb-cyan { background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }
     #ebay-midnight { background: linear-gradient(45deg, #002F6C, #0F172A) !important; }
     #posh-velvet { background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; }
@@ -89,11 +83,23 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- 3. THE HEADER & INSTRUCTIONS ---
+st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
+
+st.markdown("""
+<div class="app-instructions">
+    Lazy Lister streamlines your reselling workflow into a six-step commercial engine. 
+    First, capture a high-quality scan of your product. Second, use the AI Identification to analyze 
+    brand details, condition, and key attributes. Third, check real-time market prices across major 
+    platforms. Fourth, generate professionally styled listing copy instantly. Fifth, find the exact 
+    shipping supplies required to protect your item. Finally, log the entry into your secure inventory vault.
+</div>
+""", unsafe_allow_html=True)
+
 # --- 4. THE 6-STEP FLOW ---
-st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 # STEP 1: SCAN
-st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
+st.markdown('<p class="step-label">STEP 1: SCAN</p>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -102,31 +108,31 @@ if 'hero_shot' not in st.session_state:
         st.rerun()
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
-    if st.button("📸 NEW SCAN (PURGE SANDBOX)", use_container_width=True):
+    if st.button("ADD ITEM", use_container_width=True):
         del st.session_state.hero_shot
         st.session_state.app_state['master_id'] = ""
         st.session_state.app_state['listing_out'] = ""
         st.rerun()
 
 # STEP 2: ANALYZE
-st.markdown('<p class="step-label">STEP 2: <span class="neon-text">ANALYZE</span></p>', unsafe_allow_html=True)
-notes = st.text_area("Notes", height=100, placeholder="Brand, flaws, size...", label_visibility="collapsed")
+st.markdown('<p class="step-label">STEP 2: ANALYZE</p>', unsafe_allow_html=True)
+notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
-if st.button("🚀 RUN BRAIN ANALYSIS", use_container_width=True):
+if st.button("AI IDENTIFY", use_container_width=True):
     if 'hero_shot' in st.session_state:
-        with st.spinner("AI Brainstorming..."):
+        with st.spinner("Identifying..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
             st.session_state.app_state['master_id'] = res.text
-            # Pre-load Step 5
+            # Load Step 5 advice
             sup_res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Suggest 2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
-# STEP 3: PRICE (GOOGLE SHOPPING FIX)
-st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
-if st.session_state.app_state['master_id']: st.info(f"**AI IDENTIFIED:** {st.session_state.app_state['master_id']}")
+# STEP 3: PRICE
+st.markdown('<p class="step-label">STEP 3: PRICE</p>', unsafe_allow_html=True)
+if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
 st.markdown(f'''
@@ -137,8 +143,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4: LIST (QUERY PARAMETER ANCHORS)
-st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
+# STEP 4: LIST
+st.markdown('<p class="step-label">STEP 4: LIST</p>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -151,8 +157,13 @@ st.markdown(f'''
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# STEP 5: SUPPLIES (SHOPPING FIX)
-st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
+if st.session_state.app_state['is_pro']:
+    if st.button("OMNI-SHARE TO DEVICE", use_container_width=True): pass
+else:
+    st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
+
+# STEP 5: SUPPLIES
+st.markdown('<p class="step-label">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -163,8 +174,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 6: INVENTORY (PRO VAULT)
-st.markdown('<p class="step-label">STEP 6: <span class="neon-text">INVENTORY</span></p>', unsafe_allow_html=True)
+# STEP 6: INVENTORY
+st.markdown('<p class="step-label">STEP 6: INVENTORY</p>', unsafe_allow_html=True)
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
         with st.form("manual"):
