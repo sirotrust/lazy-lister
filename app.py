@@ -15,7 +15,7 @@ TIP_LIBRARY = {
     "6": ["Assign each item a 'Bin Number' to find sold items in under 60 seconds.", "Track your 'Cost of Goods Sold' (COGS) to see your actual net profit.", "Log the 'Date Listed' to identify 'Stale' inventory that needs a price cut.", "Quarterly inventory audits prevent 'Lost Item' cancellations.", "Keep photos on a cloud drive even after listing for backup.", "Group similar items in bins to make batch shipping faster.", "Use a simple 'SKU' system (e.g., SH-001 for Shirt #1) for tracking.", "Note the original platform listed on to avoid 'Double Selling'.", "Calculate your 'Sell-Through Rate' to see which brands flip the fastest.", "Keep your inventory off the floor to prevent moisture or dust damage."]
 }
 
-# --- 2. ENGINE ROOM ---
+# --- 2. ENGINE ROOM (HARD-LOCK) ---
 LITE_MODEL = "gemini-2.5-flash-lite" 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
@@ -42,7 +42,7 @@ st.markdown(f"""
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 16px !important; }}
     
     /* RADIO BUTTON FIX */
-    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stRadio"] label div {{
+    [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{
         color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
     }}
 
@@ -74,18 +74,17 @@ st.markdown(f"""
 
     /* PRO TIP BOX */
     .pro-tip-box {{
-        background: #F8FAFC; border-left: 4px solid #002F6C; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0;
+        background: #F8FAFC; border-left: 4px solid #002F6C; padding: 12px; margin: 10px 0; border-radius: 0 8px 8px 0;
     }}
-    .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 5px; letter-spacing: 1px; }}
+    .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* BUTTONS & ANCHORS (NO UNDERLINE) */
+    /* BUTTONS */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none !important; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }}
-    .m-btn:hover {{ text-decoration: none !important; color: #FFFFFF !important; }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
     #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
@@ -127,6 +126,7 @@ if 'hero_shot' not in st.session_state:
         st.rerun()
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
+    st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
     if st.button("ADD ITEM", use_container_width=True):
         st.session_state.app_state['tip_idx'] += 1
         for key in ['hero_shot', 'img_type']:
@@ -136,38 +136,27 @@ else:
         st.session_state.app_state['scan_count'] += 1 
         st.rerun()
 
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
-
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
-notes = st.text_area("Notes", height=100, placeholder="Describe your item if logo is uncommon or not visible...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
+notes = st.text_area("Notes", height=100, placeholder="Describe your item if details are not visible...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 if st.button("ANALYZE", use_container_width=True):
     st.session_state.app_state['tip_idx'] += 1
     if 'hero_shot' in st.session_state:
-        with st.spinner("Executing Surgical Brand Scan..."):
+        with st.spinner("Surgical Brand Scan..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
-            
-            # THE SURGICAL VISION PROMPT
             surgical_prompt = (
-                f"You are a professional item identifier. Scan the image for the SINGLE primary foreground item. "
-                f"ABSOLUTE RULE: Discard all background data, tables, and furniture surfaces. "
-                f"Look for logos, text, or specific button patterns (e.g. Alexa blue button). "
-                f"Identify the EXACT BRAND and MODEL (e.g. 'Amazon Fire TV Remote'). "
-                f"Context from user: {notes}. "
-                f"Generate a precise 5-word professional title for a reseller listing."
+                f"Professional identifier scan. Discard background/surfaces. Identify exact BRAND and MODEL. "
+                f"Notes: {notes}. 5-word title."
             )
-            
             res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
             st.session_state.app_state['master_id'] = res.text
-            
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
-
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
 # STEP 3: PRICE
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
@@ -182,13 +171,15 @@ st.markdown(f'''
         <a href="https://poshmark.com/search?query={sq}" target="_blank" class="m-btn" id="posh-velvet">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
-
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
 
 # STEP 4: LIST
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
+
+# Pro Tip positioned under radio buttons but above platform buttons
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
 
 st.markdown(f'''
     <div class="flex-grid">
@@ -200,22 +191,24 @@ st.markdown(f'''
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
-
 # STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
-if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
+
+# Tip positioned above buttons
+st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
 st.markdown(f'''
     <div class="flex-grid">
-        <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
+        <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
         <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
     </div>
 ''', unsafe_allow_html=True)
 
-st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
+# Ai tips positioned below buttons
+if st.session_state.app_state['supply_tips']: 
+    st.success(f"📦 Ai tips: {st.session_state.app_state['supply_tips']}")
 
 # STEP 6: INVENTORY
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
@@ -242,7 +235,7 @@ with st.sidebar:
     st.markdown("### 💎 COMMERCIAL SUITE")
     st.session_state.app_state['is_pro'] = st.toggle("Simulate Pro Subscription", value=st.session_state.app_state['is_pro'])
 
-# Query Parameter Listener for Platform Trigger
+# Trigger Listener
 params = st.query_params
 if "action" in params:
     action = params.get("action")
