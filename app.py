@@ -3,7 +3,6 @@ import pandas as pd
 import random
 from datetime import datetime
 from google import genai
-from google.generativeai import types
 
 # --- 1. THE ARCHITECTURAL ENGINE (ULTRA-CONTRAST CSS) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
@@ -13,7 +12,7 @@ if 'inventory' not in st.session_state:
 
 # Google Client Handshake
 try:
-    google_client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+    client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 except Exception:
     st.error("LEAD DEV: API Handshake Failed. Check secrets.toml.")
 
@@ -89,38 +88,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. THE MASTER 50-TIP NEURAL LIBRARY ---
-TIP_POOL = {
-    "s1": ["Pro Tip: Use the rear-facing lens; it has 40% higher resolution.", "Pro Tip: Lock AE/AF Lock by holding the screen.", "Pro Tip: Natural window light between 10am-2pm is best.", "Pro Tip: Turn on gridlines for perfect leveling.", "Pro Tip: Move closer; never use digital zoom.", "Pro Tip: Clean your lens before every session.", "Pro Tip: Use white backgrounds for AI edge detection.", "Pro Tip: Shoot the care tag for fabric verification.", "Pro Tip: Use white board to reflect light into shadows.", "Pro Tip: Shoot shoes at a 45-degree hero angle."],
-    "s2": ["Pro Tip: Place the Brand and Model in the first 3 words.", "Pro Tip: Use words like 'buttery' or 'structured' to sell the feel.", "Pro Tip: Mention 'Smoke-Free' to build buyer trust.", "Pro Tip: List Pit-to-pit, Length, and Sleeve measurements.", "Pro Tip: Use 'texture' keywords like 'slubby'.", "Pro Tip: Define the Vibe: Is it Gorpcore or Minimalist?", "Pro Tip: Find the model code on the internal tag.", "Pro Tip: Disclose pilling early to reduce returns.", "Pro Tip: Use 'Azure' or 'Cobalt' instead of just 'Blue'.", "Pro Tip: Mention hardware quality for premium items."],
-    "s3": ["Pro Tip: Check 'Sold' listings, not 'Active' ones.", "Pro Tip: Price 10% high to allow for negotiations.", "Pro Tip: $24.99 converts 15% better than $25.00.", "Pro Tip: Weigh items before pricing for shipping.", "Pro Tip: Cross-reference eBay vs Poshmark for averages.", "Pro Tip: Free Shipping tags increase filter hits by 2x.", "Pro Tip: Price vintage on rarity, not just fashion.", "Pro Tip: Drop prices by 10% on Fridays for paydays.", "Pro Tip: High-demand brands follow strict MSRP logic.", "Pro Tip: High-quality photos justify a 20% price hike."],
-    "s4": ["Pro Tip: Max out 80 characters in eBay titles.", "Pro Tip: Relist items every 30 days for 'New' status.", "Pro Tip: Share closet at 9PM EST for peak activity.", "Pro Tip: Use seasonal keywords like 'Summer Essential'.", "Pro Tip: Never use stock photos alone; AI flags them.", "Pro Tip: Put top 5 SEO tags in description footer.", "Pro Tip: Use 'Expert' style for tech listings.", "Pro Tip: Respond within 5 mins on FB Marketplace.", "Pro Tip: Send offers within 10 mins of a 'Like'.", "Pro Tip: Combine shipping to encourage multi-buys."],
-    "s5": ["Expert Partner: This Thermal Printer pays for itself.", "Sourcing Secret: Scales prevent shipping surcharges.", "Visual Power: Kill 'Yellow Tint' with lighting kits.", "Boutique Standard: Matte-black mailers win fans.", "Speed Logic: Steamers remove wrinkles 3x faster.", "Professional Edge: Items on mannequins sell 20% faster.", "Mandatory Tool: Accurate measurements for SEO.", "Volume Strategy: Bulk 6-pack tape saves $12.", "Efficiency Pro: Clear bin storage keeps inventory searchable.", "The Pro Finish: Thermal 4x labels look corporate."]
-}
-
-# --- 3. UI EXECUTION ---
+# --- 2. UI EXECUTION ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 # STEP 1
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color: #0EA5E9;">📸 PRO TIP</span><p style="margin:0; font-weight:600;">{random.choice(TIP_POOL['s1'])}</p></div>''', unsafe_allow_html=True)
 img_file = st.camera_input("Scanner", label_visibility="collapsed")
 
 # STEP 2
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F59E0B;">📝 PRO TIP</span><p style="margin:0; font-weight:600;">{random.choice(TIP_POOL['s2'])}</p></div>''', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, Size, Condition...", label_visibility="collapsed")
 
 # STEP 3
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color: #0EA5E9;">💰 PRO TIP</span><p style="margin:0; font-weight:600;">{random.choice(TIP_POOL['s3'])}</p></div>''', unsafe_allow_html=True)
 
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
     if img_file:
         with st.spinner("AI Brain Thinking..."):
-            parts = [types.Part.from_text(text=f"Analyze item: {notes}"), 
-                     types.Part.from_bytes(data=img_file.getvalue(), mime_type=img_file.type)]
-            response = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=parts)
+            response = client.models.generate_content(
+                model="gemini-2.0-flash-lite-preview-02-05",
+                contents=[notes, img_file]
+            )
             st.info(response.text)
 
 st.markdown(f'''
@@ -134,32 +122,35 @@ st.markdown(f'''
 
 # STEP 4
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F59E0B;">🚀 PRO TIP</span><p style="margin:0; font-weight:600;">{random.choice(TIP_POOL['s4'])}</p></div>''', unsafe_allow_html=True)
 
 style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
-# Platform Trigger Logic
-def run_listing(platform):
-    prompt = f"Write a {style} style listing for {platform}. Details: {notes}"
-    res = google_client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[prompt])
-    st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": platform})
-    return res.text
-
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    if st.button("FB", use_container_width=True): st.session_state.listing = run_listing("Facebook")
+    if st.button("FB", use_container_width=True):
+        res = client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[f"Write a {style} Facebook listing: {notes}"])
+        st.session_state.listing = res.text
+        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": "Facebook"})
 with col2:
-    if st.button("EBAY", use_container_width=True): st.session_state.listing = run_listing("eBay")
+    if st.button("EBAY", use_container_width=True):
+        res = client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[f"Write a {style} eBay listing: {notes}"])
+        st.session_state.listing = res.text
+        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": "eBay"})
 with col3:
-    if st.button("CL", use_container_width=True): st.session_state.listing = run_listing("Craigslist")
+    if st.button("CL", use_container_width=True):
+        res = client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[f"Write a {style} Craigslist listing: {notes}"])
+        st.session_state.listing = res.text
+        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": "Craigslist"})
 with col4:
-    if st.button("POSH", use_container_width=True): st.session_state.listing = run_listing("Poshmark")
+    if st.button("POSH", use_container_width=True):
+        res = client.models.generate_content(model="gemini-2.0-flash-lite-preview-02-05", contents=[f"Write a {style} Poshmark listing: {notes}"])
+        st.session_state.listing = res.text
+        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": "Poshmark"})
 
 st.text_area("Output", value=st.session_state.get('listing', ''), height=150, label_visibility="collapsed")
 
 # STEP 5
 st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color: #0EA5E9;">📦 PARTNER</span><p style="margin:0; font-weight:600;">{random.choice(TIP_POOL['s5'])}</p></div>''', unsafe_allow_html=True)
 st.markdown('''
     <div class="flex-grid">
         <a href="https://google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
