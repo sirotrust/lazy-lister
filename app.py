@@ -56,20 +56,20 @@ st.markdown("""
 
     /* BRANDING & HEADER */
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
-    .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+    .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 18px !important; }
     
     /* MICRO-INSTRUCTIONS (10px) */
     .instruction-container { margin: 20px 0 30px 0; max-width: 900px; }
     .instruction-row { 
         display: flex; 
         align-items: center; 
-        margin-bottom: 4px;
-        gap: 8px;
+        margin-bottom: 2px;
+        gap: 6px;
     }
     .instruction-num {
         font-size: 10px;
         font-weight: 950;
-        min-width: 15px;
+        min-width: 12px;
         flex-shrink: 0;
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
@@ -86,18 +86,19 @@ st.markdown("""
         white-space: nowrap;
     }
 
-    /* THE CALIBRATED STEP LABELS (54px) */
+    /* THE MAX-SCALE STEP LABELS (58px) */
     .step-label { 
         font-weight: 950; 
-        font-size: 54px; /* Larger than 18px sub, smaller than 60px title */
+        font-size: 58px !important; /* Absolute ceiling */
         text-transform: uppercase; 
-        margin-top: 48px; 
-        display: inline-block;
+        margin-top: 40px; 
+        display: block; /* Ensure it takes full width and doesn't shrink */
+        width: 100%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.0;
+        line-height: 0.9;
         letter-spacing: -2px;
-        border-bottom: 7px solid #F1F5F9;
+        border-bottom: 8px solid #F8FAFC;
     }
     .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
     .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
@@ -123,7 +124,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 3. THE HEADER & MICRO-INSTRUCTIONS ---
-st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
+st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="instruction-container">
@@ -139,7 +140,7 @@ st.markdown("""
 # --- 4. THE 6-STEP FLOW ---
 
 # STEP 1: SCAN (ODD)
-st.markdown('<p class="step-label step-odd">STEP 1: SCAN</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-odd">STEP 1: SCAN</div>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -155,7 +156,7 @@ else:
         st.rerun()
 
 # STEP 2: ANALYZE (EVEN)
-st.markdown('<p class="step-label step-even">STEP 2: ANALYZE</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-even">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
 if st.button("AI IDENTIFY", use_container_width=True):
@@ -170,7 +171,7 @@ if st.button("AI IDENTIFY", use_container_width=True):
             st.rerun()
 
 # STEP 3: PRICE (ODD)
-st.markdown('<p class="step-label step-odd">STEP 3: PRICE</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-odd">STEP 3: PRICE</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -183,7 +184,7 @@ st.markdown(f'''
 ''', unsafe_allow_html=True)
 
 # STEP 4: LIST (EVEN)
-st.markdown('<p class="step-label step-even">STEP 4: LIST</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-even">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -202,7 +203,7 @@ else:
     st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
 
 # STEP 5: SUPPLIES (ODD)
-st.markdown('<p class="step-label step-odd">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-odd">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -214,7 +215,7 @@ st.markdown(f'''
 ''', unsafe_allow_html=True)
 
 # STEP 6: INVENTORY (EVEN)
-st.markdown('<p class="step-label step-even">STEP 6: INVENTORY</p>', unsafe_allow_html=True)
+st.markdown('<div class="step-label step-even">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
         with st.form("manual"):
