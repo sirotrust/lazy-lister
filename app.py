@@ -5,7 +5,7 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. THE ARCHITECTURAL ENGINE (RESTORATION FROM ARCH1.PY) ---
+# --- 1. THE ARCHITECTURAL ENGINE (ARCH1.PY BLUEPRINT) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 if 'inventory' not in st.session_state:
@@ -16,7 +16,6 @@ if 'listing_out' not in st.session_state:
 # Google Client Handshake (Flash-Lite Engine)
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    # CORRECTED MODEL STRING FOR API COMPATIBILITY
     LITE_MODEL = "gemini-2.0-flash-lite-preview"
 except Exception:
     st.error("LEAD DEV: API Handshake Failed. Check secrets.toml.")
@@ -78,6 +77,7 @@ const trigger = (key) => {
 };
 
 doc.addEventListener('click', (e) => {
+    // Intercept clicks on original HTML IDs to fire Python logic
     if (e.target.id === 'fb-blue') trigger('GHOST_FB');
     if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
     if (e.target.id === 'cl-purple') trigger('GHOST_CL');
@@ -95,6 +95,7 @@ img_file = st.camera_input("Scanner", label_visibility="collapsed")
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", key="notes_input", height=100, placeholder="Brand, Size, Condition...", label_visibility="collapsed")
 
+# RESTORED STEP 3 BUTTON
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
     if img_file:
@@ -115,6 +116,7 @@ st.markdown(f'''
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
 style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
+# ORIGINAL HTML GRID
 st.markdown(f'''
     <div class="flex-grid">
         <a href="#" class="m-btn" id="fb-blue">FB</a>
