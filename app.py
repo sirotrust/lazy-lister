@@ -15,7 +15,7 @@ if 'app_state' not in st.session_state:
         'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False
     }
 
-# Query Parameter Listener for Step 4 Execution (Backend Reliability)
+# Query Parameter Listener for Step 4 Execution (Stability Anchor)
 params = st.query_params
 if "action" in params:
     action = params.get("action")
@@ -58,29 +58,32 @@ st.markdown("""
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     
-    /* MODERN VERTICAL INSTRUCTIONS (ALIGNED) */
-    .instruction-container { margin: 25px 0 35px 20px; }
+    /* SYMMETRICAL ALIGNED INSTRUCTIONS */
+    .instruction-container { margin: 30px 0 40px 0; max-width: 900px; }
     .instruction-row { 
         display: flex; 
         align-items: flex-start; 
-        margin-bottom: 6px;
+        margin-bottom: 12px;
+        gap: 10px;
     }
     .instruction-num {
-        font-size: 13px;
-        font-weight: 900;
-        color: #0F172A;
-        width: 25px;
+        font-size: 20px;
+        font-weight: 950;
+        min-width: 30px;
         flex-shrink: 0;
-    }
-    .instruction-text { 
-        font-size: 11px; 
-        font-weight: 800; 
-        text-transform: uppercase; 
-        letter-spacing: 0.8px; 
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.4;
+    }
+    .instruction-text { 
+        font-size: 20px; 
+        font-weight: 950; 
+        text-transform: uppercase; 
+        letter-spacing: 0.5px; 
+        background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.2;
     }
 
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
@@ -105,33 +108,33 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & ALIGNED INSTRUCTIONS ---
+# --- 3. THE HEADER & PRECISION INSTRUCTIONS ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="instruction-container">
     <div class="instruction-row">
-        <div class="instruction-num">1.</div>
+        <div class="instruction-num">1</div>
         <div class="instruction-text">SCAN — Capture high-resolution product image</div>
     </div>
     <div class="instruction-row">
-        <div class="instruction-num">2.</div>
+        <div class="instruction-num">2</div>
         <div class="instruction-text">IDENTIFY — Activate AI to extract brand and condition data</div>
     </div>
     <div class="instruction-row">
-        <div class="instruction-num">3.</div>
+        <div class="instruction-num">3</div>
         <div class="instruction-text">PRICE — Analyze real-time market comps and pricing</div>
     </div>
     <div class="instruction-row">
-        <div class="instruction-num">4.</div>
+        <div class="instruction-num">4</div>
         <div class="instruction-text">LIST — Generate professional listing copy instantly</div>
     </div>
     <div class="instruction-row">
-        <div class="instruction-num">5.</div>
+        <div class="instruction-num">5</div>
         <div class="instruction-text">SUPPLY — Acquire specialized packing materials</div>
     </div>
     <div class="instruction-row">
-        <div class="instruction-num">6.</div>
+        <div class="instruction-num">6</div>
         <div class="instruction-text">VAULT — Archive entry into secure inventory</div>
     </div>
 </div>
