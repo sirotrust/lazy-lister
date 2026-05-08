@@ -5,21 +5,32 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. THE BRAIN & STATE ANCHOR ---
+# --- 1. THE SELF-HEALING ENGINE ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
 if 'app_state' not in st.session_state:
-    st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro"}
+    st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro", 'active_model': None}
 
-# Google Client Handshake (Native Logic)
+# Dynamic Discovery Handshake
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    # NATIVE IDENTIFIER FOR SDK 1.75.0
-    LITE_MODEL = "gemini-1.5-flash"
-except Exception:
-    st.error("LEAD DEV: API Handshake Failed.")
+    
+    # Auto-Discovery Logic: Ask the server what it supports
+    if st.session_state.app_state['active_model'] is None:
+        available_models = [m.name for m in client.models.list()]
+        # Priority filter: Look for Flash-1.5 or 2.0 specifically
+        target = next((m for m in available_models if "gemini-1.5-flash" in m), None)
+        if not target:
+            target = next((m for m in available_models if "flash" in m), "gemini-1.5-flash")
+        
+        # Clean the string (remove 'models/' prefix if library adds it twice)
+        st.session_state.app_state['active_model'] = target.replace("models/", "")
+    
+    LITE_MODEL = st.session_state.app_state['active_model']
+except Exception as e:
+    st.error(f"SYSTEM ADVISOR: Handshake Failed. Verify API Key in Secrets. {str(e)}")
 
 # --- 2. MASTERPIECE CSS (PROTECTIVE LAYER) ---
 st.markdown("""
@@ -58,7 +69,7 @@ st.markdown("""
     [data-testid="stSidebar"] { display: none !important; }
     
     /* BUFFER ZONE SPACING */
-    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; }
+    .buffer-box { margin: 80px 0; border-top: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 20px 0;}
     </style>
 """, unsafe_allow_html=True)
 
@@ -145,15 +156,14 @@ st.markdown('''
     </div>
 ''', unsafe_allow_html=True)
 
-# --- 5. ZONE C: THE BUFFER ZONE ---
+# --- 5. ZONE C: THE BUFFER ZONE (FUTURE MARKETING) ---
 st.markdown('<div class="buffer-box">', unsafe_allow_html=True)
 st.write("&nbsp;") 
-st.write("&nbsp;")
 st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 6. ZONE D: INVENTORY LOG ---
 st.divider()
-st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Ready..."], "Platform": ["--"], "Date": ["--"]}))
+st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Scanning Log Ready..."], "Platform": ["--"], "Date": ["--"]}))
 
 # --- 7. THE ENGINE ROOM (INVISIBLE SIDEBAR) ---
 with st.sidebar:
