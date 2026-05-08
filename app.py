@@ -58,7 +58,7 @@ st.markdown("""
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     
-    /* MICRO-INSTRUCTIONS (SHRUNK) */
+    /* MICRO-INSTRUCTIONS (10px) */
     .instruction-container { margin: 20px 0 30px 0; max-width: 900px; }
     .instruction-row { 
         display: flex; 
@@ -86,24 +86,26 @@ st.markdown("""
         white-space: nowrap;
     }
 
-    /* ALTERNATING GRADIENT STEP LABELS */
+    /* MEGA STEP LABELS (ALTERNATING GRADIENTS) */
     .step-label { 
         font-weight: 950; 
-        font-size: 38px; /* Enlarged */
+        font-size: 60px; /* MEGA SIZE */
         text-transform: uppercase; 
-        margin-top: 40px; 
+        margin-top: 50px; 
         display: inline-block;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        border-bottom: 6px solid #F1F5F9;
+        line-height: 1.0;
+        letter-spacing: -2px;
+        border-bottom: 8px solid #F1F5F9;
     }
     .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
     .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
 
     /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
-    .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
+    .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }
     .m-btn {
-        flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }
     
@@ -114,7 +116,7 @@ st.markdown("""
     #amz-brown { background-color: #483332 !important; }
     
     .stButton button {
-        height: 60px !important; border-radius: 12px !important; font-weight: 950 !important;
+        height: 65px !important; border-radius: 12px !important; font-weight: 950 !important;
         background: #0F172A !important; color: white !important; border: none !important;
     }
     </style>
@@ -136,7 +138,7 @@ st.markdown("""
 
 # --- 4. THE 6-STEP FLOW ---
 
-# STEP 1: SCAN (ODD - Light to Dark)
+# STEP 1: SCAN (ODD)
 st.markdown('<p class="step-label step-odd">STEP 1: SCAN</p>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
@@ -152,7 +154,7 @@ else:
         st.session_state.app_state['listing_out'] = ""
         st.rerun()
 
-# STEP 2: ANALYZE (EVEN - Dark to Light)
+# STEP 2: ANALYZE (EVEN)
 st.markdown('<p class="step-label step-even">STEP 2: ANALYZE</p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
@@ -167,7 +169,7 @@ if st.button("AI IDENTIFY", use_container_width=True):
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
-# STEP 3: PRICE (ODD - Light to Dark)
+# STEP 3: PRICE (ODD)
 st.markdown('<p class="step-label step-odd">STEP 3: PRICE</p>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
@@ -180,7 +182,7 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4: LIST (EVEN - Dark to Light)
+# STEP 4: LIST (EVEN)
 st.markdown('<p class="step-label step-even">STEP 4: LIST</p>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
@@ -199,7 +201,7 @@ if st.session_state.app_state['is_pro']:
 else:
     st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
 
-# STEP 5: SUPPLIES (ODD - Light to Dark)
+# STEP 5: SUPPLIES (ODD)
 st.markdown('<p class="step-label step-odd">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
@@ -211,7 +213,7 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 6: INVENTORY (EVEN - Dark to Light)
+# STEP 6: INVENTORY (EVEN)
 st.markdown('<p class="step-label step-even">STEP 6: INVENTORY</p>', unsafe_allow_html=True)
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
