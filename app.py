@@ -15,7 +15,7 @@ TIP_LIBRARY = {
     "6": ["Assign each item a 'Bin Number' to find sold items in under 60 seconds.", "Track your 'Cost of Goods Sold' (COGS) to see your actual net profit.", "Log the 'Date Listed' to identify 'Stale' inventory that needs a price cut.", "Quarterly inventory audits prevent 'Lost Item' cancellations.", "Keep photos on a cloud drive even after listing for backup.", "Group similar items in bins to make batch shipping faster.", "Use a simple 'SKU' system (e.g., SH-001 for Shirt #1) for tracking.", "Note the original platform listed on to avoid 'Double Selling'.", "Calculate your 'Sell-Through Rate' to see which brands flip the fastest.", "Keep your inventory off the floor to prevent moisture or dust damage."]
 }
 
-# --- 2. ENGINE ROOM (HARD-LOCK) ---
+# --- 2. ENGINE ROOM ---
 LITE_MODEL = "gemini-2.5-flash-lite" 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
@@ -47,7 +47,7 @@ st.markdown(f"""
     }}
 
     /* TOP NAV MANUAL */
-    .instruction-container {{ margin: 15px 0 30px 0; max-width: 950px; }}
+    .instruction-container {{ margin: 15px 0 20px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ 
         font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; 
@@ -58,7 +58,7 @@ st.markdown(f"""
 
     /* STEP LABELS (28px) */
     .step-label {{ 
-        font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; 
+        font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 25px; 
         display: block; width: 100%;
         background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -79,12 +79,13 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* BUTTONS */
+    /* BUTTONS & ANCHORS (NO UNDERLINE) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none !important; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }}
+    .m-btn:hover {{ text-decoration: none !important; color: #FFFFFF !important; }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
     #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
@@ -136,27 +137,30 @@ else:
         st.session_state.app_state['scan_count'] += 1 
         st.rerun()
 
-# STEP 2: ANALYZE
+# STEP 2: ANALYZE (ACTION-FIRST REORG)
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
-notes = st.text_area("Notes", height=100, placeholder="Describe your item if details are not visible...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
+# Pro Tip positioned under Instruction but above Button
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
+
 if st.button("ANALYZE", use_container_width=True):
     st.session_state.app_state['tip_idx'] += 1
     if 'hero_shot' in st.session_state:
-        with st.spinner("Surgical Brand Scan..."):
+        with st.spinner("Executing Surgical Brand Scan..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             surgical_prompt = (
-                f"Professional identifier scan. Discard background/surfaces. Identify exact BRAND and MODEL. "
-                f"Notes: {notes}. 5-word title."
+                f"Professional identifier. Discard backgrounds. Identify exact BRAND and MODEL. "
+                f"Notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
             )
             res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
             st.session_state.app_state['master_id'] = res.text
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
+
+notes = st.text_area("Notes", height=100, placeholder="Describe your item if details are not visible...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
 # STEP 3: PRICE
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
@@ -178,7 +182,6 @@ st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
-# Pro Tip positioned under radio buttons but above platform buttons
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
 
 st.markdown(f'''
@@ -195,7 +198,6 @@ st.text_area("Output", value=st.session_state.app_state['listing_out'], height=1
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 
-# Tip positioned above buttons
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -206,7 +208,6 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# Ai tips positioned below buttons
 if st.session_state.app_state['supply_tips']: 
     st.success(f"📦 Ai tips: {st.session_state.app_state['supply_tips']}")
 
@@ -235,19 +236,23 @@ with st.sidebar:
     st.markdown("### 💎 COMMERCIAL SUITE")
     st.session_state.app_state['is_pro'] = st.toggle("Simulate Pro Subscription", value=st.session_state.app_state['is_pro'])
 
-# Trigger Listener
+# --- STATE ANCHOR LISTENER (STABILITY FIX) ---
 params = st.query_params
 if "action" in params:
     action = params.get("action")
     ctx = st.session_state.app_state['master_id']
     if ctx:
         try:
+            # Tip Rotate only on unique action
             st.session_state.app_state['tip_idx'] += 1 
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             style = st.session_state.get("style_radio", "Simple")
             res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {action} listing for: {ctx}"])
+            # Save to permanent state before clearing params
             st.session_state.app_state['listing_out'] = res.text
             st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": action.upper()})
             st.query_params.clear()
             st.rerun()
-        except: st.query_params.clear()
+        except: 
+            st.query_params.clear()
+            st.rerun()
