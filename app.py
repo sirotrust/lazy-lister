@@ -109,7 +109,9 @@ st.markdown(f'''<div class="suggestion-box"><span class="tip-tag" style="color: 
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
     if img_file:
         with st.spinner("Brain Processing..."):
-            response = client.models.generate_content(model=LITE_MODEL, contents=[notes, img_file])
+            # FIXED LINE 112: Converting image for google-genai compatibility
+            image_data = {"mime_type": img_file.type, "data": img_file.getvalue()}
+            response = client.models.generate_content(model=LITE_MODEL, contents=[notes, image_data])
             st.info(response.text)
 
 st.markdown(f'''
@@ -127,7 +129,7 @@ st.markdown(f'''<div class="reminder-box"><span class="tip-tag" style="color: #F
 
 style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
-# RESTORED HTML GRID FOR STEP 4 (SAME AS STEP 3)
+# COLOR-LOCKED HTML GRID FOR STEP 4
 st.markdown(f'''
     <div class="flex-grid">
         <a href="?platform=Facebook" class="m-btn" id="fb-blue">FB</a>
@@ -137,7 +139,7 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# Logic to handle the platform selection via URL Parameters (Masterpiece Standard)
+# Query Parameter Listener
 params = st.query_params
 if "platform" in params:
     plat = params["platform"]
