@@ -264,7 +264,7 @@ if st.session_state.app_state['supply_tips']:
 
 # --- STEP 6: INVENTORY ---
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Create and share your items</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Track and list your items</div>', unsafe_allow_html=True)
 
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
