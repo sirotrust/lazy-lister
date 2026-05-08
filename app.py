@@ -86,18 +86,18 @@ st.markdown("""
         white-space: nowrap;
     }
 
-    /* MEGA STEP LABELS (ALTERNATING GRADIENTS) */
+    /* LARGE STEP LABELS (ALTERNATING GRADIENTS) */
     .step-label { 
         font-weight: 950; 
-        font-size: 60px; /* MEGA SIZE */
+        font-size: 48px; /* Almost as big as title (60px) */
         text-transform: uppercase; 
-        margin-top: 50px; 
+        margin-top: 45px; 
         display: inline-block;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.0;
-        letter-spacing: -2px;
-        border-bottom: 8px solid #F1F5F9;
+        line-height: 1.1;
+        letter-spacing: -1.5px;
+        border-bottom: 6px solid #F1F5F9;
     }
     .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
     .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
