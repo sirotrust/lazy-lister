@@ -6,7 +6,6 @@ from google import genai
 from google.genai import types
 
 # --- 1. ENGINE ROOM (HARD-LOCK) ---
-# Hard-coded to Gemini 2.5 Flash-Lite for 1500+ RPD and $0.10/MTok pricing.
 LITE_MODEL = "gemini-2.5-flash-lite" 
 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
@@ -17,8 +16,6 @@ if 'app_state' not in st.session_state:
     st.session_state.app_state = {
         'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False, 'scan_count': 0
     }
-if 'notes_input' not in st.session_state:
-    st.session_state.notes_input = ""
 
 # --- 2. BACKEND TRIGGER (QUERY PARAMETER ANCHOR) ---
 params = st.query_params
@@ -66,10 +63,7 @@ st.markdown(f"""
     /* MICRO-INSTRUCTIONS (12px - ONE LINE) */
     .instruction-container {{ margin: 20px 0 30px 0; max-width: 950px; }}
     .instruction-row {{ 
-        display: flex; 
-        align-items: center; 
-        margin-bottom: 3px;
-        gap: 6px;
+        display: flex; align-items: center; margin-bottom: 3px; gap: 6px;
     }}
     .instruction-num {{
         font-size: 12px; font-weight: 950; min-width: 14px; flex-shrink: 0;
@@ -92,11 +86,16 @@ st.markdown(f"""
         line-height: 1.0; letter-spacing: -1px; border-bottom: 4px solid #F8FAFC;
     }}
 
-    /* PLATFORM BUTTONS (STEP 3, 4, 5) */
+    /* PLATFORM BUTTONS (NO UNDERLINE LOCK) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-        text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 14px; text-transform: uppercase; border: none;
+        text-decoration: none !important; /* Underline Purge */
+        color: #FFFFFF !important; font-weight: 950; font-size: 14px; text-transform: uppercase; border: none;
+    }}
+    .m-btn:hover, .m-btn:active, .m-btn:visited {{
+        text-decoration: none !important;
+        color: #FFFFFF !important;
     }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
@@ -107,15 +106,10 @@ st.markdown(f"""
     
     /* ENHANCED NATIVE BUTTONS (ADD ITEM / ANALYZE) */
     .stButton button {{
-        height: 70px !important; 
-        border-radius: 14px !important; 
-        font-weight: 950 !important;
-        font-size: 22px !important; 
-        background: #0F172A !important; 
-        color: white !important; 
-        border: none !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
+        height: 70px !important; border-radius: 14px !important; font-weight: 950 !important;
+        font-size: 22px !important; background: #0F172A !important; 
+        color: white !important; border: none !important;
+        text-transform: uppercase !important; letter-spacing: 1px !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -163,6 +157,7 @@ if st.button("ANALYZE", use_container_width=True):
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             res = client.models.generate_content(model=LITE_MODEL, contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
             st.session_state.app_state['master_id'] = res.text
+            # Step 5 Pre-load
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
