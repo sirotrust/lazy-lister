@@ -86,19 +86,19 @@ st.markdown(f"""
         white-space: nowrap;
     }}
 
-    /* THE CALIBRATED STEP LABELS (52px) */
+    /* THE CALIBRATED STEP LABELS (36px) */
     .step-label {{ 
         font-weight: 950; 
-        font-size: 52px !important; /* Calibrated to fit one line */
+        font-size: 36px !important; /* Calibrated to prevent wrapping while maintaining scale */
         text-transform: uppercase; 
-        margin-top: 40px; 
+        margin-top: 35px; 
         display: block;
         width: 100%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 0.9;
-        letter-spacing: -2px;
-        border-bottom: 8px solid #F8FAFC;
+        line-height: 1.0;
+        letter-spacing: -1px;
+        border-bottom: 4px solid #F8FAFC;
     }}
     .step-odd {{ background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }}
     .step-even {{ background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }}
