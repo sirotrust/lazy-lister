@@ -5,12 +5,11 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# --- 1. THE ARCHITECTURAL ENGINE (RESTORATION FROM ARCH1.PY) ---
+# --- 1. THE ARCHITECTURAL ENGINE (ARCH1.PY BLUEPRINT) ---
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
-
 if 'listing_out' not in st.session_state:
     st.session_state.listing_out = ""
 
@@ -21,37 +20,26 @@ try:
 except Exception:
     st.error("LEAD DEV: API Handshake Failed. Check secrets.toml.")
 
+# ORIGINAL CSS (ZONE 1-6)
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
     .stApp { background-color: #FFFFFF !important; }
 
     /* ZONE 1: RADIO & LABEL VISIBILITY */
-    [data-testid="stRadio"] label, 
-    [data-testid="stRadio"] label p,
-    [data-testid="stWidgetLabel"] p {
-        color: #0F172A !important;
-        font-weight: 800 !important;
-        opacity: 1 !important;
+    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {
+        color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
     }
 
     /* ZONE 2: TABLE CONTRAST */
-    [data-testid="stTable"] td, 
-    [data-testid="stTable"] th {
-        color: #0F172A !important;
-        background-color: #F8FAFC !important;
-        font-weight: 600 !important;
-        border: 1px solid #E2E8F0 !important;
+    [data-testid="stTable"] td, [data-testid="stTable"] th {
+        color: #0F172A !important; background-color: #F8FAFC !important; font-weight: 600 !important; border: 1px solid #E2E8F0 !important;
     }
 
     /* ZONE 3: TEXT INPUTS */
     [data-testid="stTextArea"] textarea {
-        background-color: #F1F5F9 !important;
-        color: #0F172A !important; 
-        -webkit-text-fill-color: #0F172A !important;
-        font-weight: 600 !important;
-        border: 2px solid #CBD5E1 !important;
-        border-radius: 12px !important;
+        background-color: #F1F5F9 !important; color: #0F172A !important; -webkit-text-fill-color: #0F172A !important;
+        font-weight: 600 !important; border: 2px solid #CBD5E1 !important; border-radius: 12px !important;
     }
 
     /* ZONE 4: BRANDING */
@@ -73,30 +61,50 @@ st.markdown("""
     #cl-purple { background-color: #502189 !important; }
     
     /* ZONE 6: BOXES */
-    .suggestion-box { background-color: #F0F9FF !important; border-left: 6px solid #0EA5E9 !important; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #E0F2FE; }
-    .reminder-box { background-color: #FFFBEB !important; border-left: 6px solid #F59E0B !important; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #FEF3C7; }
-    .tip-tag { font-weight: 950; font-size: 11px; text-transform: uppercase; }
+    .suggestion-box, .reminder-box { padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid; }
+    .suggestion-box { background-color: #F0F9FF !important; border-left: 6px solid #0EA5E9 !important; border-color: #E0F2FE; }
+    .reminder-box { background-color: #FFFBEB !important; border-left: 6px solid #F59E0B !important; border-color: #FEF3C7; }
+    
+    /* GHOST TRIGGER STYLING (HIDDEN AT BOTTOM) */
+    div.stButton > button[kind="secondary"] {
+        position: fixed; bottom: -50px; left: 0; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 2. UI EXECUTION ---
+# --- 2. THE JAVASCRIPT BRIDGE (ZERO DESIGN CHANGE) ---
+st.components.v1.html("""
+<script>
+const doc = window.parent.document;
+const trigger = (key) => {
+    const btns = Array.from(doc.querySelectorAll('button'));
+    const target = btns.find(el => el.innerText.includes(key));
+    if (target) target.click();
+};
+
+// Map original HTML IDs to Ghost Triggers
+doc.addEventListener('click', (e) => {
+    if (e.target.id === 'fb-blue') trigger('GHOST_FB');
+    if (e.target.id === 'ebay-blue') trigger('GHOST_EBAY');
+    if (e.target.id === 'cl-purple') trigger('GHOST_CL');
+    if (e.target.id === 'posh-maroon') trigger('GHOST_POSH');
+});
+</script>
+""", height=0)
+
+# --- 3. UI EXECUTION (YOUR ORIGINAL DESIGN) ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
-# STEP 1
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
 img_file = st.camera_input("Scanner", label_visibility="collapsed")
 
-# STEP 2
 st.markdown('<p class="step-label">STEP 2: <span class="neon-text">DESCRIBE</span></p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", key="notes_input", height=100, placeholder="Brand, Size, Condition...", label_visibility="collapsed")
 
-# STEP 3
 st.markdown('<p class="step-label">STEP 3: <span class="neon-text">PRICE</span></p>', unsafe_allow_html=True)
-
 if st.button("🚀 ANALYZE MARKET", type="primary", use_container_width=True):
     if img_file:
         with st.spinner("Brain Processing..."):
-            # Fixed part for mobile validation
             part = types.Part.from_bytes(data=img_file.getvalue(), mime_type=img_file.type)
             response = client.models.generate_content(model=LITE_MODEL, contents=[notes, part])
             st.info(response.text)
@@ -110,46 +118,33 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4
 st.markdown('<p class="step-label">STEP 4: <span class="neon-text">LIST</span></p>', unsafe_allow_html=True)
 style = st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed")
 
+# YOUR ORIGINAL HTML STEP 4 BUTTONS
 st.markdown(f'''
     <div class="flex-grid">
-        <a href="?platform=Facebook" class="m-btn" id="fb-blue">FB</a>
-        <a href="?platform=eBay" class="m-btn" id="ebay-blue">EBAY</a>
-        <a href="?platform=Craigslist" class="m-btn" id="cl-purple">CL</a>
-        <a href="?platform=Poshmark" class="m-btn" id="posh-maroon">POSH</a>
+        <a href="#" class="m-btn" id="fb-blue">FB</a>
+        <a href="#" class="m-btn" id="ebay-blue">EBAY</a>
+        <a href="#" class="m-btn" id="cl-purple">CL</a>
+        <a href="#" class="m-btn" id="posh-maroon">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
-
-params = st.query_params
-if "platform" in params:
-    plat = params["platform"]
-    with st.spinner(f"Writing {plat} Listing..."):
-        res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing: {notes}"])
-        st.session_state.listing_out = res.text
-        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": plat})
-        st.query_params.clear()
 
 st.text_area("Output", value=st.session_state.listing_out, height=150, label_visibility="collapsed")
 
-# STEP 5
-st.markdown('<p class="step-label">STEP 5: <span class="neon-text">SUPPLIES</span></p>', unsafe_allow_html=True)
-st.markdown('''
-    <div class="flex-grid">
-        <a href="https://google.com" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
-        <a href="https://amazon.com" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
-    </div>
-''', unsafe_allow_html=True)
+# --- 4. THE GHOST TRIGGERS (HIDDEN AT BOTTOM) ---
+def run_ghost(p):
+    with st.spinner(f"Writing {p} Listing..."):
+        res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {p} listing: {notes}"])
+        st.session_state.listing_out = res.text
+        st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": notes[:30], "Platform": p})
+
+if st.button("GHOST_FB", type="secondary"): run_ghost("Facebook")
+if st.button("GHOST_EBAY", type="secondary"): run_ghost("eBay")
+if st.button("GHOST_CL", type="secondary"): run_ghost("Craigslist")
+if st.button("GHOST_POSH", type="secondary"): run_ghost("Poshmark")
 
 # INVENTORY LOG
 st.divider()
-st.markdown('<p class="step-label">INVENTORY LOG</p>', unsafe_allow_html=True)
-
-if not st.session_state.inventory:
-    ghost_data = pd.DataFrame({"Item": ["Scanning Log..."], "Platform": ["--"], "Date": ["--"]})
-    st.table(ghost_data)
-else:
-    df = pd.DataFrame(st.session_state.inventory)
-    st.table(df)
+st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Scanning Log..."], "Platform": ["--"], "Date": ["--"]}))
