@@ -58,35 +58,47 @@ st.markdown("""
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     
-    /* SYMMETRICAL ALIGNED INSTRUCTIONS */
-    .instruction-container { margin: 30px 0 40px 0; max-width: 900px; }
+    /* MICRO-INSTRUCTIONS (SHRUNK) */
+    .instruction-container { margin: 20px 0 30px 0; max-width: 900px; }
     .instruction-row { 
         display: flex; 
-        align-items: flex-start; 
-        margin-bottom: 12px;
-        gap: 10px;
+        align-items: center; 
+        margin-bottom: 4px;
+        gap: 8px;
     }
     .instruction-num {
-        font-size: 20px;
+        font-size: 10px;
         font-weight: 950;
-        min-width: 30px;
+        min-width: 15px;
         flex-shrink: 0;
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     .instruction-text { 
-        font-size: 20px; 
+        font-size: 10px; 
         font-weight: 950; 
         text-transform: uppercase; 
         letter-spacing: 0.5px; 
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.2;
+        white-space: nowrap;
     }
 
-    .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
+    /* ALTERNATING GRADIENT STEP LABELS */
+    .step-label { 
+        font-weight: 950; 
+        font-size: 38px; /* Enlarged */
+        text-transform: uppercase; 
+        margin-top: 40px; 
+        display: inline-block;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        border-bottom: 6px solid #F1F5F9;
+    }
+    .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
+    .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
 
     /* PRO-PALETTE BUTTONS (HTML ANCHORS) */
     .flex-grid { display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 10px 0; }
@@ -108,42 +120,24 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & PRECISION INSTRUCTIONS ---
+# --- 3. THE HEADER & MICRO-INSTRUCTIONS ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="instruction-container">
-    <div class="instruction-row">
-        <div class="instruction-num">1</div>
-        <div class="instruction-text">SCAN — Capture high-resolution product image</div>
-    </div>
-    <div class="instruction-row">
-        <div class="instruction-num">2</div>
-        <div class="instruction-text">IDENTIFY — Activate AI to extract brand and condition data</div>
-    </div>
-    <div class="instruction-row">
-        <div class="instruction-num">3</div>
-        <div class="instruction-text">PRICE — Analyze real-time market comps and pricing</div>
-    </div>
-    <div class="instruction-row">
-        <div class="instruction-num">4</div>
-        <div class="instruction-text">LIST — Generate professional listing copy instantly</div>
-    </div>
-    <div class="instruction-row">
-        <div class="instruction-num">5</div>
-        <div class="instruction-text">SUPPLY — Acquire specialized packing materials</div>
-    </div>
-    <div class="instruction-row">
-        <div class="instruction-num">6</div>
-        <div class="instruction-text">VAULT — Archive entry into secure inventory</div>
-    </div>
+    <div class="instruction-row"><div class="instruction-num">1</div><div class="instruction-text">SCAN — Capture image</div></div>
+    <div class="instruction-row"><div class="instruction-num">2</div><div class="instruction-text">IDENTIFY — Extract data</div></div>
+    <div class="instruction-row"><div class="instruction-num">3</div><div class="instruction-text">PRICE — Market comps</div></div>
+    <div class="instruction-row"><div class="instruction-num">4</div><div class="instruction-text">LIST — Generate copy</div></div>
+    <div class="instruction-row"><div class="instruction-num">5</div><div class="instruction-text">SUPPLY — Packing tools</div></div>
+    <div class="instruction-row"><div class="instruction-num">6</div><div class="instruction-text">VAULT — Archive entry</div></div>
 </div>
 """, unsafe_allow_html=True)
 
 # --- 4. THE 6-STEP FLOW ---
 
-# STEP 1: SCAN
-st.markdown('<p class="step-label">STEP 1: SCAN</p>', unsafe_allow_html=True)
+# STEP 1: SCAN (ODD - Light to Dark)
+st.markdown('<p class="step-label step-odd">STEP 1: SCAN</p>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -158,8 +152,8 @@ else:
         st.session_state.app_state['listing_out'] = ""
         st.rerun()
 
-# STEP 2: ANALYZE
-st.markdown('<p class="step-label">STEP 2: ANALYZE</p>', unsafe_allow_html=True)
+# STEP 2: ANALYZE (EVEN - Dark to Light)
+st.markdown('<p class="step-label step-even">STEP 2: ANALYZE</p>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed")
 
 if st.button("AI IDENTIFY", use_container_width=True):
@@ -169,13 +163,12 @@ if st.button("AI IDENTIFY", use_container_width=True):
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
             st.session_state.app_state['master_id'] = res.text
-            # Load Step 5 advice
             sup_res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Suggest 2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
-# STEP 3: PRICE (GOOGLE SHOPPING FIX)
-st.markdown('<p class="step-label">STEP 3: PRICE</p>', unsafe_allow_html=True)
+# STEP 3: PRICE (ODD - Light to Dark)
+st.markdown('<p class="step-label step-odd">STEP 3: PRICE</p>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -187,8 +180,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4: LIST (QUERY PARAMETER ANCHOR)
-st.markdown('<p class="step-label">STEP 4: LIST</p>', unsafe_allow_html=True)
+# STEP 4: LIST (EVEN - Dark to Light)
+st.markdown('<p class="step-label step-even">STEP 4: LIST</p>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -206,8 +199,8 @@ if st.session_state.app_state['is_pro']:
 else:
     st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
 
-# STEP 5: SUPPLIES (GOOGLE SHOPPING FIX)
-st.markdown('<p class="step-label">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
+# STEP 5: SUPPLIES (ODD - Light to Dark)
+st.markdown('<p class="step-label step-odd">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -218,8 +211,8 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 6: INVENTORY
-st.markdown('<p class="step-label">STEP 6: INVENTORY</p>', unsafe_allow_html=True)
+# STEP 6: INVENTORY (EVEN - Dark to Light)
+st.markdown('<p class="step-label step-even">STEP 6: INVENTORY</p>', unsafe_allow_html=True)
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
         with st.form("manual"):
