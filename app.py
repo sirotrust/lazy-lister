@@ -58,32 +58,32 @@ st.markdown(f"""
     .brand-word {{ color: #0F172A; font-size: 70px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 18px !important; }}
     
-    /* MICRO-INSTRUCTIONS (10px) */
-    .instruction-container {{ margin: 20px 0 30px 0; max-width: 900px; }}
+    /* MICRO-INSTRUCTIONS (12px - ONE LINE ONLY) */
+    .instruction-container {{ margin: 20px 0 30px 0; max-width: 950px; }}
     .instruction-row {{ 
         display: flex; 
         align-items: center; 
-        margin-bottom: 2px;
+        margin-bottom: 3px;
         gap: 6px;
     }}
     .instruction-num {{
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 950;
-        min-width: 12px;
+        min-width: 14px;
         flex-shrink: 0;
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }}
     .instruction-text {{ 
-        font-size: 10px; 
+        font-size: 12px; 
         font-weight: 950; 
         text-transform: uppercase; 
         letter-spacing: 0.5px; 
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        white-space: nowrap;
+        white-space: nowrap; /* Enforce single line */
     }}
 
     /* UNIFORM STEP LABELS (36px - LIGHT TO DARK) */
