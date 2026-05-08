@@ -162,7 +162,6 @@ notes = st.text_area("Notes", height=100, placeholder="Describe your item detail
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Compare market value</div>', unsafe_allow_html=True)
 
-# Pro Tip positioned above the buttons
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
 
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
@@ -198,6 +197,7 @@ with c3:
         if st.button("POSHMARK", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "POSHMARK"
 
+# 🛠️ THE FIX: Protected Backend Logic for Step 4
 if 'action_trigger' in st.session_state.app_state:
     plat = st.session_state.app_state.pop('action_trigger')
     ctx = st.session_state.app_state['master_id']
@@ -212,8 +212,9 @@ if 'action_trigger' in st.session_state.app_state:
                 st.session_state.app_state['tip_idx'] += 1
                 st.rerun()
             except Exception as e:
-                if "429" in str(e) or "exhausted" in str(e).lower():
-                    st.warning("⏳ **SPEED LIMIT HIT:** You are testing too fast! The AI needs a breather. Wait 60 seconds and click the button again.")
+                # Catches the 429 Resource Exhausted speed limit error and prevents a crash
+                if "429" in str(e) or "exhausted" in str(e).lower() or "quota" in str(e).lower():
+                    st.warning("⏳ **SPEED LIMIT HIT:** You are testing too fast! The API needs a breather. Wait 60 seconds and click the button again.")
                 else:
                     st.error(f"⚠️ ENGINE FAILURE: {str(e)}")
 
