@@ -15,7 +15,7 @@ if 'app_state' not in st.session_state:
         'master_id': "", 'listing_out': "", 'supply_tips': "", 'is_pro': False
     }
 
-# Query Parameter Listener for Step 4 Execution
+# Query Parameter Listener for Step 4 Execution (Reliability Anchor)
 params = st.query_params
 if "action" in params:
     action = params.get("action")
@@ -58,18 +58,27 @@ st.markdown("""
     .brand-word { color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1px; }
     .neon-text { font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     
-    /* MODERN STREAMLINED INSTRUCTIONS */
-    .instruction-container { margin: 25px 0; border-left: 2px solid #E2E8F0; padding-left: 15px; }
+    /* HORIZONTAL SYMMETRICAL INSTRUCTIONS */
+    .instruction-container { 
+        display: flex; 
+        justify-content: space-between; 
+        margin: 20px 0 30px 40px; /* Left indentation */
+        padding-right: 40px; 
+        max-width: 100%;
+        border-top: 1px solid #F1F5F9;
+        border-bottom: 1px solid #F1F5F9;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
     .modern-instruction-item { 
-        font-size: 12px; 
+        font-size: 10px; 
         font-weight: 800; 
         text-transform: uppercase; 
-        letter-spacing: 1px; 
-        margin-bottom: 4px;
+        letter-spacing: 0.5px; 
         background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        display: block;
+        white-space: nowrap;
     }
 
     .step-label { color: #0F172A !important; font-weight: 950; font-size: 28px; text-transform: uppercase; margin-top: 30px; border-bottom: 4px solid #0F172A; display: inline-block; }
@@ -94,17 +103,17 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE HEADER & MODERN INSTRUCTIONS ---
+# --- 3. THE HEADER & SYMMETRICAL INSTRUCTIONS ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="instruction-container">
-    <span class="modern-instruction-item">1 SCAN — Capture high-resolution product image</span>
-    <span class="modern-instruction-item">2 IDENTIFY — Activate AI to extract brand and condition data</span>
-    <span class="modern-instruction-item">3 PRICE — Analyze real-time market comps and pricing</span>
-    <span class="modern-instruction-item">4 LIST — Generate professional listing copy instantly</span>
-    <span class="modern-instruction-item">5 SUPPLY — Acquire specialized packing materials</span>
-    <span class="modern-instruction-item">6 VAULT — Archive entry into secure inventory</span>
+    <span class="modern-instruction-item">1 SCAN — IMAGE CAPTURE</span>
+    <span class="modern-instruction-item">2 IDENTIFY — AI DATA</span>
+    <span class="modern-instruction-item">3 PRICE — MARKET COMPS</span>
+    <span class="modern-instruction-item">4 LIST — COPY GENERATION</span>
+    <span class="modern-instruction-item">5 SUPPLY — PACKING TOOLS</span>
+    <span class="modern-instruction-item">6 VAULT — ARCHIVE ENTRY</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -142,7 +151,7 @@ if st.button("AI IDENTIFY", use_container_width=True):
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
 
-# STEP 3: PRICE
+# STEP 3: PRICE (GOOGLE SHOPPING FIX)
 st.markdown('<p class="step-label">STEP 3: PRICE</p>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
@@ -155,7 +164,7 @@ st.markdown(f'''
     </div>
 ''', unsafe_allow_html=True)
 
-# STEP 4: LIST
+# STEP 4: LIST (QUERY PARAMETER ANCHOR)
 st.markdown('<p class="step-label">STEP 4: LIST</p>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
@@ -174,7 +183,7 @@ if st.session_state.app_state['is_pro']:
 else:
     st.button("OMNI-SHARE (PRO ONLY 🔒)", disabled=True, use_container_width=True)
 
-# STEP 5: SUPPLIES
+# STEP 5: SUPPLIES (GOOGLE SHOPPING FIX)
 st.markdown('<p class="step-label">STEP 5: SUPPLIES</p>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
