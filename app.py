@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
+import json
+import streamlit.components.v1 as components
 from datetime import datetime
 from google import genai
 from google.genai import types
@@ -32,7 +34,7 @@ def get_pro_tip(step_num):
     idx = st.session_state.app_state['tip_idx'] % 10
     return TIP_LIBRARY[str(step_num)][idx]
 
-# --- 2b. SILENT ACTION LISTENER (Prevents Reset) ---
+# --- 2b. SILENT ACTION LISTENER ---
 params = st.query_params
 if "action" in params:
     action = params.get("action")
@@ -77,17 +79,17 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* GLOBAL NATIVE BUTTON OVERRIDES (Fixes The Blob) */
+    /* GLOBAL NATIVE BUTTON OVERRIDES */
     .stButton button {{
         height: 65px !important; border-radius: 14px !important; font-weight: 950 !important;
         font-size: 18px !important; text-transform: uppercase !important; letter-spacing: 1px !important;
-        margin-bottom: 12px !important; /* Adds clear separation when stacked on mobile */
+        margin-bottom: 12px !important; 
     }}
     .stButton button * {{
         color: #FFFFFF !important;
     }}
 
-    /* WARNING BOX TEXT VISIBILITY FIX (Overcomes Phone Dark Mode) */
+    /* WARNING BOX FIX */
     [data-testid="stNotification"] * {{
         color: #0F172A !important;
         font-weight: 800 !important;
@@ -147,7 +149,9 @@ with stylable_container("analyze_btn", css_styles="""button {background: #0F172A
                 surgical_prompt = f"Professional item identification. Discard backgrounds. Identify exact BRAND and MODEL. Notes: {st.session_state.get(f'notes_{st.session_state.app_state['scan_count']}', '')}. 5-word title."
                 res = client.models.generate_content(model=LITE_MODEL, contents=[surgical_prompt, part])
                 st.session_state.app_state['master_id'] = res.text
-                sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
+                
+                # THE "NOVEL" FIX: Max 10 words
+                sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Name 2 specific packing supplies for {res.text}. Maximum 10 words total. Be extremely brief."])
                 st.session_state.app_state['supply_tips'] = sup_res.text
                 st.rerun()
 
@@ -203,7 +207,34 @@ if 'action_trigger' in st.session_state.app_state:
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# --- STEP 5: SUPPLIES (REVERTED TO FOOLPROOF HTML FLEXBOX) ---
+# THE CLIPBOARD FIX: Bypasses manual selection via isolated JavaScript execCommand
+if st.session_state.app_state['listing_out']:
+    safe_text = json.dumps(st.session_state.app_state['listing_out'])
+    copy_html = f"""
+    <script>
+    function copyToClipboard() {{
+        const el = document.createElement('textarea');
+        el.value = {safe_text};
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        const btn = document.getElementById('copybtn');
+        btn.innerHTML = '✅ COPIED TO CLIPBOARD';
+        btn.style.background = '#0F172A';
+        setTimeout(() => {{
+            btn.innerHTML = '📋 COPY TO CLIPBOARD';
+            btn.style.background = '#0ea5e9';
+        }}, 2000);
+    }}
+    </script>
+    <button id="copybtn" onclick="copyToClipboard()" style="width: 100%; height: 60px; background: #0ea5e9; color: white; border-radius: 12px; border: none; font-weight: 950; font-size: 16px; text-transform: uppercase; font-family: sans-serif; cursor: pointer; transition: 0.3s; margin-top: 5px;">
+    📋 COPY TO CLIPBOARD
+    </button>
+    """
+    components.html(copy_html, height=80)
+
+# --- STEP 5: SUPPLIES ---
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
