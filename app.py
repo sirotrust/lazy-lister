@@ -13,15 +13,15 @@ if 'inventory' not in st.session_state:
 if 'app_state' not in st.session_state:
     st.session_state.app_state = {'analysis': "", 'listing_out': "", 'style': "Pro"}
 
-# Google Client Handshake (Final Stable Handshake)
+# Google Client Handshake (Transition Complete)
 try:
     client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-    # FIXED MODEL STRING TO PREVENT 404
-    LITE_MODEL = "models/gemini-1.5-flash-latest"
+    # STABLE IDENTIFIER FROM LOG ANALYSIS
+    LITE_MODEL = "gemini-1.5-flash"
 except Exception:
     st.error("LEAD DEV: API Handshake Failed.")
 
-# --- 2. MASTERPIECE CSS (RESTORATION FROM ARCH1) ---
+# --- 2. MASTERPIECE CSS (PROTECTIVE UI LAYER) ---
 st.markdown("""
     <style>
     header, footer, [data-testid="stHeader"] {visibility: hidden; display: none;}
@@ -54,7 +54,7 @@ st.markdown("""
     #fb-blue { background-color: #1877F2 !important; }
     #cl-purple { background-color: #502189 !important; }
 
-    /* ZONE D: SIDEBAR HIDER (ENGINE ROOM) */
+    /* ZONE D: SIDEBAR HIDER */
     [data-testid="stSidebar"] { display: none !important; }
     
     /* BUFFER ZONE SPACING */
@@ -62,7 +62,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. THE JAVASCRIPT BRIDGE ---
+# --- 3. THE JAVASCRIPT BRIDGE (HEADLESS) ---
 st.components.v1.html("""
 <script>
 const doc = window.parent.document;
@@ -80,10 +80,10 @@ doc.addEventListener('click', (e) => {
 </script>
 """, height=0)
 
-# --- 4. ZONE A & B: CORE WORK AREA ---
+# --- 4. ZONE A & B: UI EXECUTION ---
 st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text" style="font-size:18px;">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
-# STEP 1: SCAN
+# STEP 1: SCAN (Battery Privacy Guard)
 st.markdown('<p class="step-label">STEP 1: <span class="neon-text">SCAN</span></p>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
@@ -145,13 +145,13 @@ st.markdown('''
     </div>
 ''', unsafe_allow_html=True)
 
-# --- 5. ZONE C: THE BUFFER ZONE (FUTURE AFFILIATES) ---
+# --- 5. ZONE C: THE BUFFER ZONE (FUTURE CONTENT) ---
 st.markdown('<div class="buffer-box">', unsafe_allow_html=True)
 st.write("&nbsp;") 
 st.write("&nbsp;")
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 6. ZONE D: INVENTORY LOG ---
+# --- 6. ZONE D: INVENTORY LOG (RESTORED INTERACTION) ---
 st.divider()
 st.table(pd.DataFrame(st.session_state.inventory) if st.session_state.inventory else pd.DataFrame({"Item": ["Log Ready..."], "Platform": ["--"], "Date": ["--"]}))
 
