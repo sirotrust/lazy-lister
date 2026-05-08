@@ -86,18 +86,18 @@ st.markdown("""
         white-space: nowrap;
     }
 
-    /* LARGE STEP LABELS (ALTERNATING GRADIENTS) */
+    /* THE CALIBRATED STEP LABELS (54px) */
     .step-label { 
         font-weight: 950; 
-        font-size: 48px; /* Almost as big as title (60px) */
+        font-size: 54px; /* Larger than 18px sub, smaller than 60px title */
         text-transform: uppercase; 
-        margin-top: 45px; 
+        margin-top: 48px; 
         display: inline-block;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        line-height: 1.1;
-        letter-spacing: -1.5px;
-        border-bottom: 6px solid #F1F5F9;
+        line-height: 1.0;
+        letter-spacing: -2px;
+        border-bottom: 7px solid #F1F5F9;
     }
     .step-odd { background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); }
     .step-even { background-image: linear-gradient(to left, #22d3ee, #002F6C, #8C1B2F); }
@@ -160,7 +160,7 @@ notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws..
 
 if st.button("AI IDENTIFY", use_container_width=True):
     if 'hero_shot' in st.session_state:
-        with st.spinner("Identifying..."):
+        with st.spinner("Analyzing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             res = client.models.generate_content(model="gemini-1.5-flash", contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
