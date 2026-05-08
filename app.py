@@ -104,10 +104,10 @@ st.markdown(f"""
 <div class="instruction-container">
     <div class="instruction-row"><div class="instruction-text">1. Scan         -    Take a photo of your items</div></div>
     <div class="instruction-row"><div class="instruction-text">2. Analyze      -    Search online with Ai</div></div>
-    <div class="instruction-row"><div class="instruction-text">3. Price        -    Search with Ai for market value</div></div>
+    <div class="instruction-row"><div class="instruction-text">3. Price        -    Search Ai for market value</div></div>
     <div class="instruction-row"><div class="instruction-text">4. List         -    Generate a listing with Ai</div></div>
-    <div class="instruction-row"><div class="instruction-text">5. Supplies     -    Purchase shipping supplies</div></div>
-    <div class="instruction-row"><div class="instruction-text">6. Inventory    -    Create a log and share your items</div></div>
+    <div class="instruction-row"><div class="instruction-text">5. Supplies     -    Purchase related supplies</div></div>
+    <div class="instruction-row"><div class="instruction-text">6. Inventory    -    Track your item inventory</div></div>
 </div>
 """, unsafe_allow_html=True)
 
