@@ -1,5 +1,5 @@
 import streamlit as st
-import pandas as pd
+import pd as pd
 import urllib.parse
 import json
 import streamlit.components.v1 as components
@@ -66,7 +66,7 @@ st.markdown(f"""
     [data-testid="stRadio"] label, [data-testid="stRadio"] label p {{ color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important; }}
 
     /* TOP NAV MANUAL */
-    .instruction-container {{ margin: 5px 0 25px 0; max-width: 950px; font-family: 'Courier New', Courier, monospace; }}
+    .instruction-container {{ margin: 35px 0 25px 0; max-width: 950px; font-family: 'Courier New', Courier, monospace; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: pre; }}
 
