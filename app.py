@@ -113,7 +113,7 @@ st.markdown(f"""
     }}
 
     /* TOP NAV MANUAL (12px) */
-    .instruction-container {{ margin: 20px 0 30px 0; max-width: 950px; }}
+    .instruction-container {{ margin: 15px 0 30px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ 
         font-size: 12px; font-weight: 950; text-transform: uppercase; letter-spacing: 0.5px; 
@@ -124,7 +124,7 @@ st.markdown(f"""
 
     /* STEP LABELS (28px) */
     .step-label {{ 
-        font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 35px; 
+        font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; 
         display: block; width: 100%;
         background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -169,7 +169,8 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- 4. APP LAYOUT ---
-st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
+# Header margin pulled to 5px for top-alignment
+st.markdown('<div style="margin-top:5px;"><span class="brand-word">LAZY 🦥 LISTER</span><br><span class="neon-text">PREMIUM RESELLER ASSISTANT</span></div>', unsafe_allow_html=True)
 
 st.markdown(f"""
 <div class="instruction-container">
