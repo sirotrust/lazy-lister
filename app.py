@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import urllib.parse
-import random
 from datetime import datetime
 from google import genai
 from google.genai import types
@@ -104,11 +103,16 @@ st.markdown(f"""
     header, footer, [data-testid="stHeader"] {{visibility: hidden; display: none;}}
     .stApp {{ background-color: #FFFFFF !important; }}
 
-    /* BRANDING (60px - Anti-Clipping) */
+    /* BRANDING (60px) */
     .brand-word {{ color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 16px !important; }}
     
-    /* TOP NAV MANUAL */
+    /* RADIO BUTTON FIX (LEGIBILITY) */
+    [data-testid="stRadio"] label, [data-testid="stRadio"] label p, [data-testid="stWidgetLabel"] p {{
+        color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
+    }}
+
+    /* TOP NAV MANUAL (12px) */
     .instruction-container {{ margin: 20px 0 30px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ 
@@ -118,7 +122,7 @@ st.markdown(f"""
         white-space: nowrap; 
     }}
 
-    /* STEP LABELS (28px - Calibrated) */
+    /* STEP LABELS (28px) */
     .step-label {{ 
         font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 35px; 
         display: block; width: 100%;
@@ -134,7 +138,7 @@ st.markdown(f"""
         white-space: nowrap; display: block; border-bottom: 2px solid #F1F5F9; padding-bottom: 5px;
     }}
 
-    /* THE PRO TIP BOX */
+    /* PRO TIP BOX */
     .pro-tip-box {{
         background: #F8FAFC; border-left: 4px solid #002F6C; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0;
     }}
@@ -169,12 +173,12 @@ st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LI
 
 st.markdown(f"""
 <div class="instruction-container">
-    <div class="instruction-row"><div class="instruction-text">1 SCAN — Capture</div></div>
-    <div class="instruction-row"><div class="instruction-text">2 ANALYZE — Extract</div></div>
-    <div class="instruction-row"><div class="instruction-text">3 MARKET COMPARISONS — Price</div></div>
-    <div class="instruction-row"><div class="instruction-text">4 LIST — Generate</div></div>
-    <div class="instruction-row"><div class="instruction-text">5 SUPPLY — Pack</div></div>
-    <div class="instruction-row"><div class="instruction-text">6 VAULT — Archive</div></div>
+    <div class="instruction-row"><div class="instruction-text">1. Scan — Take a photo</div></div>
+    <div class="instruction-row"><div class="instruction-text">2. Analyze — Search online with Ai</div></div>
+    <div class="instruction-row"><div class="instruction-text">3. Price — Compare market value</div></div>
+    <div class="instruction-row"><div class="instruction-text">4. List — Generate listing with Ai</div></div>
+    <div class="instruction-row"><div class="instruction-text">5. Supplies — Purchase shipping supplies</div></div>
+    <div class="instruction-row"><div class="instruction-text">6. Inventory — Create and share your items</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -202,8 +206,8 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Describe your item if logo is uncommon or not visible</div>', unsafe_allow_html=True)
-notes = st.text_area("Notes", height=100, placeholder="Brand, condition...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
+st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
+notes = st.text_area("Notes", height=100, placeholder="Describe your item if logo is uncommon or not visible...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
 if st.button("ANALYZE", use_container_width=True):
     st.session_state.app_state['tip_idx'] += 1
@@ -214,7 +218,6 @@ if st.button("ANALYZE", use_container_width=True):
             p = f"Identify SINGLE primary foreground item. Ignore tables/hands. Use notes: {notes}. 5-word title."
             res = client.models.generate_content(model=LITE_MODEL, contents=[p, part])
             st.session_state.app_state['master_id'] = res.text
-            # Supply Load
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
@@ -222,8 +225,8 @@ if st.button("ANALYZE", use_container_width=True):
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
 # STEP 3: PRICE
-st.markdown('<div class="step-label">STEP 3: MARKET COMPARISONS</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Analyze live data for accurate pricing</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Compare market value</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
@@ -239,7 +242,7 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 4: LIST
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Choose your listing style and generate copy instantly</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
 st.markdown(f'''
@@ -256,7 +259,7 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Access professional shipping and packing tools</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -269,9 +272,9 @@ st.markdown(f'''
 
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
-# STEP 6: INVENTORY (YELLOW BOX RE-INSTATED)
+# STEP 6: INVENTORY
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">View and manage your secure inventory archive</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Create and share your items</div>', unsafe_allow_html=True)
 
 if st.session_state.app_state['is_pro']:
     with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
