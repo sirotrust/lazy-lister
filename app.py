@@ -82,7 +82,7 @@ TIP_LIBRARY = {
     ]
 }
 
-# --- 2. ENGINE ROOM ---
+# --- 2. ENGINE ROOM (HARD-LOCK) ---
 LITE_MODEL = "gemini-2.5-flash-lite" 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
@@ -104,7 +104,7 @@ st.markdown(f"""
     header, footer, [data-testid="stHeader"] {{visibility: hidden; display: none;}}
     .stApp {{ background-color: #FFFFFF !important; }}
 
-    /* BRANDING (60px - Calibrated) */
+    /* BRANDING (60px - Anti-Clipping) */
     .brand-word {{ color: #0F172A; font-size: 60px; font-weight: 950; text-transform: uppercase; line-height: 0.8; letter-spacing: -1.5px; }}
     .neon-text {{ font-weight: 900; background: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-size: 16px !important; }}
     
@@ -118,7 +118,7 @@ st.markdown(f"""
         white-space: nowrap; 
     }}
 
-    /* STEP LABELS (28px - Anti-Clipping) */
+    /* STEP LABELS (28px - Calibrated) */
     .step-label {{ 
         font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 35px; 
         display: block; width: 100%;
@@ -128,7 +128,7 @@ st.markdown(f"""
     }}
     
     .step-sub-label {{
-        font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 10px;
+        font-weight: 800; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;
         background-image: linear-gradient(to right, #22d3ee, #002F6C, #8C1B2F);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         white-space: nowrap; display: block; border-bottom: 2px solid #F1F5F9; padding-bottom: 5px;
@@ -141,12 +141,13 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 5px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* BUTTONS */
+    /* BUTTONS & ANCHORS (NO UNDERLINE) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
         text-decoration: none !important; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
     }}
+    .m-btn:hover {{ text-decoration: none !important; color: #FFFFFF !important; }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
     #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
@@ -156,7 +157,7 @@ st.markdown(f"""
     
     .stButton button {{
         height: 65px !important; border-radius: 14px !important; font-weight: 950 !important;
-        font-size: 20px !important; background: #0F172A !important; 
+        font-size: 22px !important; background: #0F172A !important; 
         color: white !important; border: none !important;
         text-transform: uppercase !important; letter-spacing: 1px !important;
     }}
@@ -179,7 +180,7 @@ st.markdown(f"""
 
 # STEP 1: SCAN
 st.markdown('<div class="step-label">STEP 1: SCAN</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Capture a high-resolution product image</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Take a photo of your item</div>', unsafe_allow_html=True)
 if 'hero_shot' not in st.session_state:
     img_file = st.camera_input("Scanner", label_visibility="collapsed")
     if img_file:
@@ -201,7 +202,7 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Describe item if details are not visible</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Describe your item if logo is uncommon or not visible</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
 if st.button("ANALYZE", use_container_width=True):
@@ -238,10 +239,9 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 4: LIST
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Generate professional copy instantly</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Choose your listing style and generate copy instantly</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
 
-# Using standard logic for Listing buttons since query anchors reload the tip idx automatically
 st.markdown(f'''
     <div class="flex-grid">
         <a href="/?action=facebook" target="_self" class="m-btn" id="fb-cyan">FACEBOOK</a>
@@ -256,7 +256,7 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 # STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Access shipping and packing tools</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">Access professional shipping and packing tools</div>', unsafe_allow_html=True)
 if st.session_state.app_state['supply_tips']: st.success(f"📦 BRAIN: {st.session_state.app_state['supply_tips']}")
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
@@ -269,9 +269,21 @@ st.markdown(f'''
 
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
-# STEP 6: INVENTORY
+# STEP 6: INVENTORY (YELLOW BOX RE-INSTATED)
 st.markdown('<div class="step-label">STEP 6: INVENTORY</div>', unsafe_allow_html=True)
-st.markdown('<div class="step-sub-label">Manage your secure inventory archive</div>', unsafe_allow_html=True)
+st.markdown('<div class="step-sub-label">View and manage your secure inventory archive</div>', unsafe_allow_html=True)
+
+if st.session_state.app_state['is_pro']:
+    with st.expander("➕ MANUAL ENTRY (UNLOCKED)"):
+        with st.form("manual"):
+            m_item = st.text_input("Item Name")
+            m_plat = st.selectbox("Platform", ["eBay", "Facebook", "Poshmark"])
+            if st.form_submit_button("Log Item"):
+                st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": m_item, "Platform": m_plat})
+                st.rerun()
+else:
+    st.warning("🔒 Manual Entry & Batching are reserved for Pro Subscribers.")
+
 if st.session_state.inventory:
     st.table(pd.DataFrame(st.session_state.inventory))
 
@@ -282,15 +294,14 @@ with st.sidebar:
     st.markdown("### 💎 COMMERCIAL SUITE")
     st.session_state.app_state['is_pro'] = st.toggle("Simulate Pro Subscription", value=st.session_state.app_state['is_pro'])
 
-# Listen for action via query param to trigger AI
+# Query Parameter Listener for Platform Trigger
 params = st.query_params
 if "action" in params:
-    # This block triggers when a platform button is clicked
     action = params.get("action")
     ctx = st.session_state.app_state['master_id']
     if ctx:
         try:
-            st.session_state.app_state['tip_idx'] += 1 # Rotate Tip
+            st.session_state.app_state['tip_idx'] += 1 
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             style = st.session_state.get("style_radio", "Simple")
             res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {action} listing for: {ctx}"])
