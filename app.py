@@ -77,26 +77,10 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* GLOBAL NATIVE BUTTONS */
+    /* GLOBAL NATIVE BUTTONS - No more @media flex hacks */
     .stButton button, .stLinkButton a {{
         height: 65px !important; border-radius: 14px !important; font-weight: 950 !important;
         font-size: 22px !important; text-transform: uppercase !important; letter-spacing: 1px !important; width: 100%;
-    }}
-    
-    /* MOBILE SIDE-BY-SIDE OVERRIDE FOR COLUMNS */
-    @media (max-width: 640px) {{
-        [data-testid="stHorizontalBlock"] {{
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            gap: 5px !important;
-        }}
-        [data-testid="column"] {{
-            width: auto !important;
-            flex: 1 1 0% !important;
-            min-width: 0 !important;
-        }}
-        /* Shrink text slightly on mobile so it fits in the row */
-        .stButton button p, .stLinkButton a p {{ font-size: 12px !important; }}
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -127,7 +111,8 @@ if 'hero_shot' not in st.session_state:
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
     st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VISIBILITY</div><div class="pro-tip-content">"{get_pro_tip(1)}"</div></div>""", unsafe_allow_html=True)
-    with stylable_container("add_btn", css_styles="""button {background: #0F172A !important; color: white !important;} p {color: white !important;}"""):
+    
+    with stylable_container("add_btn", css_styles="""button {background: #0F172A !important; border: none !important;} button * {color: #FFFFFF !important;}"""):
         if st.button("ADD ITEM", use_container_width=True):
             st.session_state.app_state['tip_idx'] += 1
             for key in ['hero_shot', 'img_type']:
@@ -142,7 +127,7 @@ st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=T
 st.markdown('<div class="step-sub-label">Search online with Ai</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: ACCURACY</div><div class="pro-tip-content">"{get_pro_tip(2)}"</div></div>""", unsafe_allow_html=True)
 
-with stylable_container("analyze_btn", css_styles="""button {background: #0F172A !important; color: white !important;} p {color: white !important;}"""):
+with stylable_container("analyze_btn", css_styles="""button {background: #0F172A !important; border: none !important;} button * {color: #FFFFFF !important;}"""):
     if st.button("ANALYZE", use_container_width=True):
         st.session_state.app_state['tip_idx'] += 1
         if 'hero_shot' in st.session_state:
@@ -181,23 +166,24 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 
 c1, c2, c3 = st.columns(3)
 with c1:
-    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; border: none !important;} p {color: white !important;}"""):
+    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; border: none !important;} button * {color: #FFFFFF !important;}"""):
         if st.button("FACEBOOK", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "FACEBOOK"
 with c2:
-    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; border: none !important;} p {color: white !important;}"""):
+    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; border: none !important;} button * {color: #FFFFFF !important;}"""):
         if st.button("EBAY", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "EBAY"
 with c3:
-    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; border: none !important;} p {color: white !important;}"""):
+    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; border: none !important;} button * {color: #FFFFFF !important;}"""):
         if st.button("POSHMARK", use_container_width=True):
             st.session_state.app_state['action_trigger'] = "POSHMARK"
 
+# Backend Logic for List Generation
 if 'action_trigger' in st.session_state.app_state:
     plat = st.session_state.app_state.pop('action_trigger')
     ctx = st.session_state.app_state['master_id']
     if ctx:
-        with st.spinner("Writing Listing..."):
+        with st.spinner(f"Writing {plat} Listing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             style = st.session_state.get("style_radio", "Simple")
             res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing for: {ctx}"])
@@ -208,7 +194,7 @@ if 'action_trigger' in st.session_state.app_state:
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# STEP 5: SUPPLIES (ST.LINK_BUTTON COLOR FIX)
+# STEP 5: SUPPLIES
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
@@ -216,10 +202,10 @@ st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TI
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
 s1, s2 = st.columns(2)
 with s1:
-    with stylable_container("amz_btn", css_styles="""button, a {background-color: #483332 !important; border: none !important;} p {color: white !important;}"""):
+    with stylable_container("amz_btn_strict", css_styles="""button, a {background: #483332 !important; border: none !important;} button *, a * {color: #FFFFFF !important;}"""):
         st.link_button("AMAZON", url=f"https://www.amazon.com/s?k={supply_q}", use_container_width=True)
 with s2:
-    with stylable_container("goog_btn", css_styles="""button, a {background-color: #CC0000 !important; border: none !important;} p {color: white !important;}"""):
+    with stylable_container("goog_btn_strict", css_styles="""button, a {background: #CC0000 !important; border: none !important;} button *, a * {color: #FFFFFF !important;}"""):
         st.link_button("GOOGLE", url=f"https://www.google.com/search?q={supply_q}+shipping&tbm=shop", use_container_width=True)
 
 if st.session_state.app_state['supply_tips']: 
