@@ -4,6 +4,7 @@ import urllib.parse
 from datetime import datetime
 from google import genai
 from google.genai import types
+from streamlit_extras.stylable_container import stylable_container # THE COMMUNITY FIX
 
 # --- 1. THE PRO TIP LIBRARY (60 ENTRIES) ---
 TIP_LIBRARY = {
@@ -15,7 +16,7 @@ TIP_LIBRARY = {
     "6": ["Assign each item a 'Bin Number' to find sold items in under 60 seconds.", "Track your 'Cost of Goods Sold' (COGS) to see your actual net profit.", "Log the 'Date Listed' to identify 'Stale' inventory that needs a price cut.", "Quarterly inventory audits prevent 'Lost Item' cancellations.", "Keep photos on a cloud drive even after listing for backup.", "Group similar items in bins to make batch shipping faster.", "Use a simple 'SKU' system (e.g., SH-001 for Shirt #1) for tracking.", "Note the original platform listed on to avoid 'Double Selling'.", "Calculate your 'Sell-Through Rate' to see which brands flip the fastest.", "Keep your inventory off the floor to prevent moisture or dust damage."]
 }
 
-# --- 2. ENGINE ROOM & ACTION LISTENER (TOP-LOCKED) ---
+# --- 2. ENGINE ROOM ---
 LITE_MODEL = "gemini-2.5-flash-lite" 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
@@ -30,24 +31,6 @@ if 'app_state' not in st.session_state:
 def get_pro_tip(step_num):
     idx = st.session_state.app_state['tip_idx'] % 10
     return TIP_LIBRARY[str(step_num)][idx]
-
-# --- 2b. SILENT ACTION LISTENER (Prevents Reset) ---
-params = st.query_params
-if "action" in params:
-    action = params.get("action")
-    ctx = st.session_state.app_state['master_id']
-    if ctx:
-        try:
-            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
-            style = st.session_state.get("style_radio", "Simple")
-            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {action} listing for: {ctx}"])
-            st.session_state.app_state['listing_out'] = res.text
-            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": action.upper()})
-            st.session_state.app_state['tip_idx'] += 1
-            st.query_params.clear()
-            st.rerun()
-        except: 
-            st.query_params.clear()
 
 # --- 3. UI ARCHITECTURE (CSS) ---
 st.markdown(f"""
@@ -64,7 +47,7 @@ st.markdown(f"""
         color: #0F172A !important; font-weight: 800 !important; opacity: 1 !important;
     }}
 
-    /* TOP NAV MANUAL (12px) */
+    /* TOP NAV MANUAL */
     .instruction-container {{ margin: 15px 0 25px 0; max-width: 950px; }}
     .instruction-row {{ display: flex; align-items: center; margin-bottom: 3px; gap: 6px; }}
     .instruction-text {{ 
@@ -74,7 +57,7 @@ st.markdown(f"""
         white-space: nowrap; 
     }}
 
-    /* STEP LABELS (28px) */
+    /* STEP LABELS */
     .step-label {{ 
         font-weight: 950; font-size: 28px !important; text-transform: uppercase; margin-top: 30px; 
         display: block; width: 100%;
@@ -97,26 +80,12 @@ st.markdown(f"""
     .pro-tip-header {{ font-weight: 950; font-size: 10px; text-transform: uppercase; color: #002F6C; margin-bottom: 3px; letter-spacing: 1px; }}
     .pro-tip-content {{ font-weight: 600; font-size: 13px; color: #0F172A; font-style: italic; }}
 
-    /* NO-SHADOW BUTTON GRID (HTML ANCHORS) */
-    .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
-    .m-btn {{
-        flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-        text-decoration: none !important; color: #FFFFFF !important; font-weight: 950; font-size: 14px; text-transform: uppercase; border: none;
-    }}
-    .m-btn:hover, .m-btn:active {{ text-decoration: none !important; color: white !important; }}
-    
-    #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
-    #ebay-midnight {{ background: linear-gradient(45deg, #002F6C, #0F172A) !important; }}
-    #posh-velvet {{ background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; }}
-    #google-red {{ background-color: #CC0000 !important; }}
-    #amz-brown {{ background-color: #483332 !important; }}
-    
-    /* ENHANCED NATIVE OVERRIDES (STEP 1 & 2) */
+    /* GLOBAL NATIVE BUTTONS (STEP 1 & 2) */
     .stButton button {{
         height: 70px !important; border-radius: 14px !important; font-weight: 950 !important;
         font-size: 22px !important; background: #0F172A !important; 
         color: white !important; border: none !important;
-        text-transform: uppercase !important; letter-spacing: 1px !important;
+        text-transform: uppercase !important; letter-spacing: 1px !important; width: 100%;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -176,50 +145,71 @@ if st.button("ANALYZE", use_container_width=True):
 
 notes = st.text_area("Notes", height=100, placeholder="Describe your item details...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
-# STEP 3: PRICE
+# STEP 3: PRICE (HTML Anchors fine here because they link out externally)
 st.markdown('<div class="step-label">STEP 3: PRICE</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Compare market value</div>', unsafe_allow_html=True)
 if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_state.app_state['master_id']}")
 
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
 st.markdown(f'''
-    <div class="flex-grid">
-        <a href="https://www.ebay.com/sch/i.html?_nkw={sq}&LH_Sold=1&LH_Complete=1" target="_blank" class="m-btn" id="ebay-midnight">EBAY</a>
-        <a href="https://www.google.com/search?q={sq}+price&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
-        <a href="https://poshmark.com/search?query={sq}" target="_blank" class="m-btn" id="posh-velvet">POSH</a>
+    <div style="display: flex; gap: 8px; margin: 15px 0; width: 100%;">
+        <a href="https://www.ebay.com/sch/i.html?_nkw={sq}&LH_Sold=1&LH_Complete=1" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 14px; background: linear-gradient(45deg, #002F6C, #0F172A);">EBAY</a>
+        <a href="https://www.google.com/search?q={sq}+price&tbm=shop" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 14px; background: #CC0000;">GOOGLE</a>
+        <a href="https://poshmark.com/search?query={sq}" target="_blank" style="flex: 1; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-decoration: none; color: white; font-weight: 950; font-size: 14px; background: linear-gradient(45deg, #8C1B2F, #4c0519);">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: PROFIT</div><div class="pro-tip-content">"{get_pro_tip(3)}"</div></div>""", unsafe_allow_html=True)
 
-# STEP 4: LIST
+# STEP 4: LIST (NATIVE BUTTONS WITH CUSTOM CSS CONTAINERS)
 st.markdown('<div class="step-label">STEP 4: LIST</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Generate a listing with Ai</div>', unsafe_allow_html=True)
 st.radio("Style", ["Simple", "Expert", "Pro"], horizontal=True, label_visibility="collapsed", key="style_radio")
-
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: VELOCITY</div><div class="pro-tip-content">"{get_pro_tip(4)}"</div></div>""", unsafe_allow_html=True)
 
-st.markdown(f'''
-    <div class="flex-grid">
-        <a href="/?action=facebook" target="_self" class="m-btn" id="fb-cyan">FACEBOOK</a>
-        <a href="/?action=ebay" target="_self" class="m-btn" id="ebay-midnight">EBAY</a>
-        <a href="/?action=poshmark" target="_self" class="m-btn" id="posh-velvet">POSHMARK</a>
-    </div>
-''', unsafe_allow_html=True)
+# THE FIX: stylable_container overrides Shadow DOM restrictions locally
+c1, c2, c3 = st.columns(3)
+with c1:
+    with stylable_container("fb_btn", css_styles="""button {background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; font-size: 16px !important; height: 60px !important;}"""):
+        if st.button("FACEBOOK", use_container_width=True):
+            st.session_state.app_state['action_trigger'] = "FACEBOOK"
+with c2:
+    with stylable_container("ebay_btn", css_styles="""button {background: linear-gradient(45deg, #002F6C, #0F172A) !important; font-size: 16px !important; height: 60px !important;}"""):
+        if st.button("EBAY", use_container_width=True):
+            st.session_state.app_state['action_trigger'] = "EBAY"
+with c3:
+    with stylable_container("posh_btn", css_styles="""button {background: linear-gradient(45deg, #8C1B2F, #4c0519) !important; font-size: 16px !important; height: 60px !important;}"""):
+        if st.button("POSHMARK", use_container_width=True):
+            st.session_state.app_state['action_trigger'] = "POSHMARK"
+
+# Backend Logic (Triggers immediately, NO URL Params)
+if 'action_trigger' in st.session_state.app_state:
+    plat = st.session_state.app_state.pop('action_trigger')
+    ctx = st.session_state.app_state['master_id']
+    if ctx:
+        with st.spinner("Writing Listing..."):
+            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+            style = st.session_state.get("style_radio", "Simple")
+            res = client.models.generate_content(model=LITE_MODEL, contents=[f"Write a {style} {plat} listing for: {ctx}"])
+            st.session_state.app_state['listing_out'] = res.text
+            st.session_state.inventory.append({"Date": datetime.now().strftime("%m/%d"), "Item": ctx[:30], "Platform": plat})
+            st.session_state.app_state['tip_idx'] += 1
+            st.rerun()
 
 st.text_area("Output", value=st.session_state.app_state['listing_out'], height=150, label_visibility="collapsed")
 
-# STEP 5: SUPPLIES
+# STEP 5: SUPPLIES (ST.LINK_BUTTON WITH CUSTOM CSS CONTAINER)
 st.markdown('<div class="step-label">STEP 5: SUPPLIES</div>', unsafe_allow_html=True)
 st.markdown('<div class="step-sub-label">Purchase shipping supplies</div>', unsafe_allow_html=True)
 st.markdown(f"""<div class="pro-tip-box"><div class="pro-tip-header">💡 PRO TIP: OVERHEAD</div><div class="pro-tip-content">"{get_pro_tip(5)}"</div></div>""", unsafe_allow_html=True)
 
 supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_state['master_id']}")
-st.markdown(f'''
-    <div class="flex-grid">
-        <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" class="m-btn" id="amz-brown">AMAZON</a>
-        <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
-    </div>
-''', unsafe_allow_html=True)
+s1, s2 = st.columns(2)
+with s1:
+    with stylable_container("amz_btn", css_styles="""button {background-color: #483332 !important; font-size: 16px !important; height: 60px !important;}"""):
+        st.link_button("AMAZON", url=f"https://www.amazon.com/s?k={supply_q}", use_container_width=True)
+with s2:
+    with stylable_container("goog_btn", css_styles="""button {background-color: #CC0000 !important; font-size: 16px !important; height: 60px !important;}"""):
+        st.link_button("GOOGLE", url=f"https://www.google.com/search?q={supply_q}+shipping&tbm=shop", use_container_width=True)
 
 if st.session_state.app_state['supply_tips']: 
     st.success(f"📦 Ai tips: {st.session_state.app_state['supply_tips']}")
