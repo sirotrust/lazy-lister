@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 
 # --- 1. ENGINE ROOM (HARD-LOCK) ---
+# Hard-coded to Gemini 2.5 Flash-Lite for 1500+ RPD and $0.10/MTok pricing.
 LITE_MODEL = "gemini-2.5-flash-lite" 
 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
@@ -109,7 +110,7 @@ st.markdown(f"""
         height: 70px !important; 
         border-radius: 14px !important; 
         font-weight: 950 !important;
-        font-size: 22px !important; /* Increased for readability */
+        font-size: 22px !important; 
         background: #0F172A !important; 
         color: white !important; 
         border: none !important;
@@ -173,8 +174,8 @@ if st.session_state.app_state['master_id']: st.info(f"**AI ID:** {st.session_sta
 sq = urllib.parse.quote(st.session_state.app_state['master_id'] if st.session_state.app_state['master_id'] else notes)
 st.markdown(f'''
     <div class="flex-grid">
-        <a href="https://www.ebay.com/sch/i.html?_nkw={sq}&LH_Sold=1&LH_Complete=1" target="_blank" class="m-btn" id="ebay-midnight">EBAY SOLD</a>
-        <a href="https://www.google.com/search?q={sq}+price&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
+        <a href="https://www.ebay.com/sch/i.html?_nkw={sq}&LH_Sold=1&LH_Complete=1" target="_blank" class="m-btn" id="ebay-midnight">EBAY</a>
+        <a href="https://www.google.com/search?q={sq}+price&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
         <a href="https://poshmark.com/search?query={sq}" target="_blank" class="m-btn" id="posh-velvet">POSH</a>
     </div>
 ''', unsafe_allow_html=True)
@@ -201,7 +202,7 @@ supply_q = urllib.parse.quote(f"shipping supplies for {st.session_state.app_stat
 st.markdown(f'''
     <div class="flex-grid">
         <a href="https://www.amazon.com/s?k={supply_q}" target="_blank" class="m-btn" id="amz-brown">AMAZON PRO</a>
-        <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE SHOP</a>
+        <a href="https://www.google.com/search?q={supply_q}+shipping&tbm=shop" target="_blank" class="m-btn" id="google-red">GOOGLE</a>
     </div>
 ''', unsafe_allow_html=True)
 
