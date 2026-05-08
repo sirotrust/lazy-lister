@@ -6,12 +6,10 @@ from google import genai
 from google.genai import types
 
 # --- 1. ENGINE ROOM (HARD-LOCK) ---
-# Hard-coded to Gemini 2.5 Flash-Lite for 1500+ RPD and $0.10/MTok pricing.
 LITE_MODEL = "gemini-2.5-flash-lite" 
 
 st.set_page_config(page_title="Lazy Lister Pro", layout="wide")
 
-# Initialize Session State Keys (Forensic Audit Fix)
 if 'inventory' not in st.session_state:
     st.session_state.inventory = []
 if 'app_state' not in st.session_state:
@@ -30,7 +28,6 @@ if "action" in params:
         try:
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             style_pref = st.session_state.get("style_radio", "Simple")
-            # Using the Hard-Locked Lite Model
             res = client.models.generate_content(
                 model=LITE_MODEL, 
                 contents=[f"Write a {style_pref} {action} listing for: {ctx}"]
@@ -94,11 +91,11 @@ st.markdown(f"""
         line-height: 1.0; letter-spacing: -1px; border-bottom: 4px solid #F8FAFC;
     }}
 
-    /* PLATFORM BUTTONS */
+    /* PLATFORM BUTTONS (STEP 3, 4, 5) */
     .flex-grid {{ display: flex; flex-wrap: nowrap; gap: 8px; width: 100%; margin: 15px 0; }}
     .m-btn {{
         flex: 1; height: 65px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-        text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 12px; text-transform: uppercase; border: none;
+        text-decoration: none; color: #FFFFFF !important; font-weight: 950; font-size: 14px; text-transform: uppercase; border: none;
     }}
     
     #fb-cyan {{ background: linear-gradient(45deg, #22d3ee, #0ea5e9) !important; }}
@@ -107,9 +104,17 @@ st.markdown(f"""
     #google-red {{ background-color: #CC0000 !important; }}
     #amz-brown {{ background-color: #483332 !important; }}
     
+    /* ENHANCED NATIVE BUTTONS (ADD ITEM / ANALYZE) */
     .stButton button {{
-        height: 65px !important; border-radius: 12px !important; font-weight: 950 !important;
-        background: #0F172A !important; color: white !important; border: none !important;
+        height: 70px !important; 
+        border-radius: 14px !important; 
+        font-weight: 950 !important;
+        font-size: 22px !important; /* Increased for readability */
+        background: #0F172A !important; 
+        color: white !important; 
+        border: none !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -120,7 +125,7 @@ st.markdown('<div style="margin-top:30px;"><span class="brand-word">LAZY 🦥 LI
 st.markdown("""
 <div class="instruction-container">
     <div class="instruction-row"><div class="instruction-num">1</div><div class="instruction-text">SCAN — Capture image</div></div>
-    <div class="instruction-row"><div class="instruction-num">2</div><div class="instruction-text">IDENTIFY — Extract data</div></div>
+    <div class="instruction-row"><div class="instruction-num">2</div><div class="instruction-text">ANALYZE — Extract data</div></div>
     <div class="instruction-row"><div class="instruction-num">3</div><div class="instruction-text">PRICE — Market comps</div></div>
     <div class="instruction-row"><div class="instruction-num">4</div><div class="instruction-text">LIST — Generate copy</div></div>
     <div class="instruction-row"><div class="instruction-num">5</div><div class="instruction-text">SUPPLY — Packing tools</div></div>
@@ -139,26 +144,24 @@ if 'hero_shot' not in st.session_state:
 else:
     st.image(st.session_state.hero_shot, use_container_width=True)
     if st.button("ADD ITEM", use_container_width=True):
-        # Full Reset without Session State Key Collision
-        for key in ['hero_shot', 'img_type', 'notes_input']:
+        for key in ['hero_shot', 'img_type']:
             if key in st.session_state: del st.session_state[key]
         st.session_state.app_state['master_id'] = ""
         st.session_state.app_state['listing_out'] = ""
-        st.session_state.app_state['scan_count'] += 1 # Force widget reload
+        st.session_state.app_state['scan_count'] += 1 
         st.rerun()
 
 # STEP 2: ANALYZE
 st.markdown('<div class="step-label">STEP 2: ANALYZE</div>', unsafe_allow_html=True)
 notes = st.text_area("Notes", height=100, placeholder="Brand, condition, flaws...", label_visibility="collapsed", key=f"notes_{st.session_state.app_state['scan_count']}")
 
-if st.button("AI IDENTIFY", use_container_width=True):
+if st.button("ANALYZE", use_container_width=True):
     if 'hero_shot' in st.session_state:
         with st.spinner("Analyzing..."):
             client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             part = types.Part.from_bytes(data=st.session_state.hero_shot, mime_type=st.session_state.img_type)
             res = client.models.generate_content(model=LITE_MODEL, contents=[f"Analyze image + notes: {notes}. Create 5-word title.", part])
             st.session_state.app_state['master_id'] = res.text
-            # Step 5 Pre-load
             sup_res = client.models.generate_content(model=LITE_MODEL, contents=[f"Suggest 2 packing items for: {res.text}"])
             st.session_state.app_state['supply_tips'] = sup_res.text
             st.rerun()
